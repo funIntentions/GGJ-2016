@@ -26,13 +26,6 @@ BasicGame.Game = function (game) {
 
 BasicGame.Game.prototype = {
 
-    dances: {
-        CHILLAX: 0,
-        WIGGLE: 1,
-        BOP: 2,
-        TWIRL: 3
-    },
-
     placeInSpot: function(character) {
         var scale = 0.25;
         var index;
@@ -70,10 +63,10 @@ BasicGame.Game.prototype = {
         this.input.keyboard.addKey(Phaser.KeyCode.RIGHT).onDown.add(this.incrementSelectedSpot, this);
         this.input.keyboard.addKey(Phaser.KeyCode.LEFT).onDown.add(this.decrementSelectedSpot, this);
 
-        this.input.keyboard.addKey(Phaser.KeyCode.Z).onDown.add(this.incrementSelectedSpot, this);
-        this.input.keyboard.addKey(Phaser.KeyCode.X).onDown.add(this.decrementSelectedSpot, this);
-        this.input.keyboard.addKey(Phaser.KeyCode.C).onDown.add(this.incrementSelectedSpot, this);
-        this.input.keyboard.addKey(Phaser.KeyCode.V).onDown.add(this.decrementSelectedSpot, this);
+        this.input.keyboard.addKey(Phaser.KeyCode.Z).onDown.add(this.chillaxDance, this);
+        this.input.keyboard.addKey(Phaser.KeyCode.X).onDown.add(this.wiggleDance, this);
+        this.input.keyboard.addKey(Phaser.KeyCode.C).onDown.add(this.bopDance, this);
+        this.input.keyboard.addKey(Phaser.KeyCode.V).onDown.add(this.twirlDance, this);
     },
 
     incrementSelectedSpot: function() {
@@ -86,8 +79,23 @@ BasicGame.Game.prototype = {
         if (this.selectedSpot < 0) {this.selectedSpot = 3;}
     },
 
-    update: function () {
+    chillaxDance: function() {
+        this.spots[this.selectedSpot].character.danceState = dances.CHILLAX;
+    },
 
+    wiggleDance: function() {
+        this.spots[this.selectedSpot].character.danceState = dances.WIGGLE;
+    },
+
+    bopDance: function() {
+        this.spots[this.selectedSpot].character.danceState = dances.BOP;
+    },
+
+    twirlDance: function() {
+        this.spots[this.selectedSpot].character.danceState = dances.TWIRL;
+    },
+
+    update: function () {
     },
 
     quitGame: function (pointer) {
