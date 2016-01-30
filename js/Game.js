@@ -1,4 +1,3 @@
-
 BasicGame.Game = function (game) {
 
     //  When a State is added to Phaser it automatically has the following properties set on it, even if they already exist:
@@ -27,6 +26,13 @@ BasicGame.Game = function (game) {
 
 BasicGame.Game.prototype = {
 
+    dances: {
+        CHILLAX: 0,
+        WIGGLE: 1,
+        BOP: 2,
+        TWIRL: 3
+    },
+
     placeInSpot: function(character) {
         var scale = 0.25;
         var index;
@@ -48,14 +54,10 @@ BasicGame.Game.prototype = {
 
         var distToFire = 100;
 
-        var spotOne = new FireSpot(new PIXI.Point(this.world.centerX, this.world.centerY + distToFire), false, null);
-        var spotTwo = new FireSpot(new PIXI.Point(this.world.centerX, this.world.centerY - distToFire), false, null);
-        var spotThree = new FireSpot(new PIXI.Point(this.world.centerX - distToFire, this.world.centerY), true, null);
-        var spotFour = new FireSpot(new PIXI.Point(this.world.centerX + distToFire, this.world.centerY), false, null);
-        this.spots.push(spotOne);
-        this.spots.push(spotTwo);
-        this.spots.push(spotThree);
-        this.spots.push(spotFour);
+        this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX, this.world.centerY + distToFire), false, null));
+        this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX, this.world.centerY - distToFire), false, null));
+        this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX - distToFire, this.world.centerY), true, null));
+        this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX + distToFire, this.world.centerY), false, null));
 
 
         var background = this.add.sprite(0, 0, 'background');
