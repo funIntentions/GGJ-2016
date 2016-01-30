@@ -67,6 +67,11 @@ BasicGame.Game.prototype = {
 
         this.input.keyboard.addKey(Phaser.KeyCode.RIGHT).onDown.add(this.incrementSelectedSpot, this);
         this.input.keyboard.addKey(Phaser.KeyCode.LEFT).onDown.add(this.decrementSelectedSpot, this);
+
+        this.input.keyboard.addKey(Phaser.KeyCode.Z).onDown.add(this.incrementSelectedSpot, this);
+        this.input.keyboard.addKey(Phaser.KeyCode.X).onDown.add(this.decrementSelectedSpot, this);
+        this.input.keyboard.addKey(Phaser.KeyCode.C).onDown.add(this.incrementSelectedSpot, this);
+        this.input.keyboard.addKey(Phaser.KeyCode.V).onDown.add(this.decrementSelectedSpot, this);
     },
 
     incrementSelectedSpot: function() {
