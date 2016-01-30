@@ -27,9 +27,44 @@ BasicGame.Game = function (game) {
 
 BasicGame.Game.prototype = {
 
-    create: function () {
+    
 
-        //  Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
+    placeInSpot: function(character) {
+        var scale = 0.25;
+        var index;
+        for (index = 0; index < this.spots.length; index++) {
+            if (!this.spots[index].character) {
+                console.log(this.spots[index]);
+                character.sprite.anchor.setTo(0.5, 0.5);
+                character.sprite.scale.setTo(this.spots[index].flip ? -scale : scale, scale)
+                character.sprite.position = this.spots[index].position;
+                this.spots[index].character = character;
+                break;
+            }
+        }
+    },
+
+    create: function () {
+        this.spots = [];
+
+        var distToFire = 100;
+
+        var spotOne = new FireSpot(new PIXI.Point(this.world.centerX, this.world.centerY + distToFire), false, null);
+        var spotTwo = new FireSpot(new PIXI.Point(this.world.centerX, this.world.centerY - distToFire), false, null);
+        var spotThree = new FireSpot(new PIXI.Point(this.world.centerX - distToFire, this.world.centerY), true, null);
+        var spotFour = new FireSpot(new PIXI.Point(this.world.centerX + distToFire, this.world.centerY), false, null);
+        this.spots.push(spotOne);
+        this.spots.push(spotTwo);
+        this.spots.push(spotThree);
+        this.spots.push(spotFour);
+
+
+        var background = this.add.sprite(0, 0, 'background');
+        var hubert = new Character(this.add.sprite(0, 0, 'hubert'));
+        var emmis = new Character(this.add.sprite(0, 0, 'hubert'));
+
+        this.placeInSpot(hubert);
+        this.placeInSpot(emmis);
 
     },
 
