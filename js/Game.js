@@ -27,8 +27,6 @@ BasicGame.Game = function (game) {
 
 BasicGame.Game.prototype = {
 
-    
-
     placeInSpot: function(character) {
         var scale = 0.25;
         var index;
@@ -46,6 +44,7 @@ BasicGame.Game.prototype = {
 
     create: function () {
         this.spots = [];
+        this.selectedSpot = 0;
 
         var distToFire = 100;
 
@@ -66,11 +65,21 @@ BasicGame.Game.prototype = {
         this.placeInSpot(hubert);
         this.placeInSpot(emmis);
 
+        this.input.keyboard.addKey(Phaser.KeyCode.RIGHT).onDown.add(this.incrementSelectedSpot, this);
+        this.input.keyboard.addKey(Phaser.KeyCode.LEFT).onDown.add(this.decrementSelectedSpot, this);
+    },
+
+    incrementSelectedSpot: function() {
+        this.selectedSpot = (this.selectedSpot + 1) % this.spots.length;
+    },
+
+    decrementSelectedSpot: function() {
+        this.selectedSpot = (this.selectedSpot - 1) % this.spots.length;
+
+        if (this.selectedSpot < 0) {this.selectedSpot = 3;}
     },
 
     update: function () {
-
-        //  Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
 
     },
 
