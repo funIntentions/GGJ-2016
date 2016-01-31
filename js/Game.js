@@ -1,3 +1,10 @@
+var GameState = {
+    MENU: 0,
+    TUTORIAL: 1,
+    RUNNING: 2,
+    WISDOM: 3
+};
+
 BasicGame.Game = function (game) {
 
     //  When a State is added to Phaser it automatically has the following properties set on it, even if they already exist:
@@ -50,8 +57,13 @@ BasicGame.Game.prototype = {
         this.runeYOffset = 130;
         this.requiredWisdom = 5;
         this.currentWisdom = 0;
-        this.addedWisdom = false; // Whether we've added wisdom for a successful dance arrangement
         this.messedUp = false;
+        this.currentState = GameState.RUNNING;
+        this.wisdomImparted = false;
+        this.textTween = this.add.tween(null);
+        this.textTween.to({alpha: 1}, 500, Phaser.Easing.Linear.None);
+        this.textTweenEnd = this.add.tween(null);
+        this.textTweenEnd.to({alpha: 0}, 500, Phaser.Easing.Linear.None);
 
         var distToFire = 220;
         var spotYOffset = 220;
@@ -81,6 +93,19 @@ BasicGame.Game.prototype = {
         innerFire.anchor.setTo(0.5, 0.45);
         innerFire.animations.add('burn');
         innerFire.animations.play('burn', 9, true);
+
+        this.smoke = this.add.sprite(firePit.x, firePit.y - outerFire.height / 2, 'smoke');
+        this.smoke.animations.add('coalesce');
+        this.smoke.visible = false;
+        this.smoke.anchor.setTo(0.5, 0.5);
+
+        this.gussy = this.add.sprite(this.smoke.x, this.smoke.y, 'gussy');
+        this.gussy.anchor.setTo(0.5, 0.5);
+        this.gussy.visible = false;
+
+        this.yssug = this.add.sprite(this.smoke.x, this.smoke.y, 'yssug');
+        this.yssug.anchor.setTo(0.5, 0.5);
+        this.yssug.visible = false;
 
         var melvarTheTerrible = new Character(this.add.sprite(0, 0, 'melvarTheTerrible'), this);
         var alfonso = new Character(this.add.sprite(0, 0, 'alfonso'), this);
@@ -143,6 +168,15 @@ BasicGame.Game.prototype = {
         this.runeActivatedAudio = this.add.audio('runeActivated');
         this.messedUpAudio = this.add.audio('messedUp');
         this.summonAudio = this.add.audio('summon');
+
+        var style = { font: "bold 26px Arial", fill: "#fff", boundsAlignH: "center", boundsAlignV: "middle" };
+        this.summonedText = this.add.text(0, 0, "Test", style);
+        this.summonedText.setTextBounds(0, 0, 1024, 200);
+        this.summonedText.visible = false;
+        this.summonedText.alpha = 0;
+
+        this.textTween.target = this.summonedText;
+        this.textTweenEnd.target = this.summonedText;
     },
 
     shuffle: function(array) {
@@ -165,6 +199,7 @@ BasicGame.Game.prototype = {
     },
 
     spawnFireRune: function() {
+        if(this.currentState == GameState.WISDOM) return;
 
         var secondsUntilNextRune = this.rnd.integerInRange(this.spawnMin, this.spawnMax);
         this.time.events.add(Phaser.Timer.SECOND * secondsUntilNextRune, this.spawnFireRune, this);
@@ -357,29 +392,82 @@ BasicGame.Game.prototype = {
     update: function () {
         this.updateRunes();
 
+        if(this.currentState == GameState.WISDOM) {
+            this.updateWisdomDelivery();
+            return;
+        }
+
+        // Summon Yssug when we mess up
+        if(this.messedUp) {
+            for(i = 0; i < this.runes.length; i++) this.runes[i].state = runeStates.DEAD;
+            this.impartWisdom(false);
+        }
+
         // We couldn't have succeeded if we don't have a rune at each spot
         if(this.runes.length != this.spots.length) return;
 
         var i;
         for(i = 0; i < this.runes.length; i++) if(this.runes[i].state != runeStates.ACTIVATED) break;
-        if(i == this.runes.length && !this.addedWisdom) {
+        if(i == this.runes.length) {
             for(i = 0; i < this.runes.length; i++) this.runes[i].state = runeStates.DEAD;
             // Do some effect to make runes disappear
-            this.summonAudio.play();
-            if (this.messedUp) {
-                console.log("Hello, I'm yssug");
-            } else {
-                console.log("Hello, I'm gussy");
+            this.impartWisdom(true);
+        }
+
+    },
+
+    updateWisdomDelivery: function() {
+        if(!this.wisdomImparted) {
+            if(this.smoke.animations.currentAnim.frame == 4) {
+                this.summoned.visible = true; 
+            } else if(this.smoke.animations.currentAnim.isFinished) {
+                this.wisdomImparted = true;
+                this.smoke.visible = false;
+                var textTween = this.add.tween(this.summonedText);
+                textTween.to({alpha: 1}, 500, Phaser.Easing.Linear.None);
+
+                var textTweenEnd = this.add.tween(this.summonedText);
+                textTweenEnd.to({alpha: 0}, 500, Phaser.Easing.Linear.None, true, 5000);
+                textTweenEnd.onComplete.addOnce(function() {
+                    if(this.summoned == this.gussy) {
+                        this.currentWisdom++;
+                        if(this.currentWisdom == this.requiredWisdom) {
+                            // Activate the surprise ending
+                            console.log("You win!");
+                        }
+                    }
+                    this.smoke.visible = true;
+                    this.smoke.animations.play('coalesce', 11, false);
+                }, this);
+
+                textTween.chain(textTweenEnd);
+                this.textTween.start();
             }
-            // Summon gussy
-            // Impart wisdom
-            this.currentWisdom++;
-            this.addedWisdom = true;
-            if(this.currentWisdom == this.requiredWisdom) {
-                // Activate the surprise ending
-                console.log("You win!");
+        } else {
+            if(this.smoke.animations.currentAnim.frame == 4) {
+                this.summoned.visible = false;
+            } else if(this.smoke.animations.currentAnim.isFinished) {
+                this.smoke.visible = false;
+                this.wisdomImparted = false;
+                this.currentState = GameState.RUNNING;
             }
         }
+        
+    },
+
+    impartWisdom: function(succeeded) {
+        this.currentState = GameState.WISDOM;
+        this.summonAudio.play();
+        if(succeeded) {
+            this.summoned = this.gussy;
+            this.summonedText.setText("Very wise things here.");
+        } else {
+            this.summoned = this.yssug;
+            this.summonedText.setText("Less wise things here.");
+        }
+        this.summonedText.visible = true;
+        this.smoke.visible = true;
+        this.smoke.animations.play('coalesce', 11, false);
     },
 
     quitGame: function (pointer) {

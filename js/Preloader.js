@@ -53,6 +53,8 @@ BasicGame.Preloader.prototype = {
 
         // Load gussy for our beautiful summoning
         this.load.image('gussy', 'assets/img/Gussy.png');
+        this.load.image('yssug', 'assets/img/Yssug.png');
+        this.load.spritesheet('smoke', 'assets/img/Smoke192x192x9.png', 192, 192, 9);
 
         // Audio to sooth our stress away
         this.load.audio('ocean', ['assets/audio/ocean.mp3', 'assets/audio/ocean.ogg']);
