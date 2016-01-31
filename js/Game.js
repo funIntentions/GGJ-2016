@@ -47,6 +47,9 @@ BasicGame.Game.prototype = {
         this.spawnMax = 15;
         this.runeLifeTime = 6;
         this.runeYOffset = 130;
+        this.requiredWisdom = 5;
+        this.currentWisdom = 0;
+        this.addedWisdom = false; // Whether we've added wisdom for a successful dance arrangement
 
         var distToFire = 240;
 
@@ -304,6 +307,23 @@ BasicGame.Game.prototype = {
 
     update: function () {
         this.updateRunes();
+
+        // We couldn't have succeeded if we don't have a rune at each spot
+        if(this.runes.length != this.spots.length) return;
+
+        var i;
+        for(i = 0; i < this.runes.length; i++) if(this.runes[i].state != runeStates.ACTIVATED) break;
+        if(i == this.runes.length && !this.addedWisdom) {
+            // Do some effect to make runes disappear
+            // Summon gussy
+            // Impart wisdom
+            this.currentWisdom++;
+            this.addedWisdom = true;
+            if(this.currentWisdom == this.requiredWisdom) {
+                // Activate the surprise ending
+                console.log("You win!");
+            }
+        }
     },
 
     quitGame: function (pointer) {

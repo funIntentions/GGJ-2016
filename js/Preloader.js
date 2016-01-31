@@ -47,6 +47,9 @@ BasicGame.Preloader.prototype = {
         this.load.image('twirlRune', 'assets/img/TwirlRune.png');
         this.load.image('wiggleRune', 'assets/img/WiggleRune.png');
 
+        // Load gussy for our beautiful summoning
+        this.load.image('gussy', 'assets/img/Gussy.png');
+
 	},
 
 	create: function () {
