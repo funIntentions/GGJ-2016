@@ -459,7 +459,7 @@ BasicGame.Game.prototype = {
             this.summonedText.setText(this.wisdom[this.rnd.integerInRange(0, this.wisdom.length)]);
         } else {
             this.summoned = this.yssug;
-            var text = this.wisdom[this.rnd.integerInRange(0, this.wisdom.length)];
+            var text = this.wisdom[this.rnd.integerInRange(0, this.wisdom.length - 1)];
             text = text.split(" ");
             text = this.shuffle(text);
             var recombined = "";
