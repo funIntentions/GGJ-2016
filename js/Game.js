@@ -52,31 +52,51 @@ BasicGame.Game.prototype = {
 
         this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX, this.world.centerY + distToFire), false, null));
         this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX, this.world.centerY - distToFire), false, null));
-        this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX - distToFire, this.world.centerY), true, null));
+        this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX - distToFire, this.world.centerY), false, null));
         this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX + distToFire, this.world.centerY), false, null));
 
         var background = this.add.sprite(0, 0, 'background');
         var firePit = this.add.sprite(this.world.centerX, this.world.centerY, 'firePit');
         firePit.anchor.setTo(0.5, 0.3);
+
+        var outerFire = this.add.sprite(firePit.x, firePit.y, 'largeFire');
+        outerFire.anchor.setTo(0.5, 0.7);
+        outerFire.animations.add('burn');
+        outerFire.animations.play('burn', 8, true);
+
+        var middleFire = this.add.sprite(firePit.x, firePit.y, 'medFire');
+        middleFire.anchor.setTo(0.5, 0.65);
+        middleFire.animations.add('burn');
+        middleFire.animations.play('burn', 8.5, true);
+
+        var innerFire = this.add.sprite(firePit.x, firePit.y, 'smallFire');
+        innerFire.anchor.setTo(0.5, 0.45);
+        innerFire.animations.add('burn');
+        innerFire.animations.play('burn', 9, true);
+        
         var melvarTheTerrible = new Character(this.add.sprite(0, 0, 'melvarTheTerrible'), this);
         var alfonso = new Character(this.add.sprite(0, 0, 'alfonso'), this);
         var hubert = new Character(this.add.sprite(0, 0, 'hubert'), this);
-        var emmis = new Character(this.add.sprite(0, 0, 'gourdis'), this);
+        var gourdis = new Character(this.add.sprite(0, 0, 'gourdis'), this);
 
-        this.placeInSpot(hubert);
-        this.placeInSpot(emmis);
-        this.placeInSpot(alfonso);
         this.placeInSpot(melvarTheTerrible);
+        this.placeInSpot(gourdis);
+        this.placeInSpot(alfonso);
+        this.placeInSpot(hubert);
 
         hubert.addPositionDependentTweens(this);
-        emmis.addPositionDependentTweens(this);
+        alfonso.addPositionDependentTweens(this);
+        gourdis.addPositionDependentTweens(this);
+        melvarTheTerrible.addPositionDependentTweens(this);
 
         hubert.tweens[hubert.danceState].tween.start();
-        emmis.tweens[emmis.danceState].tween.start();
+        gourdis.tweens[gourdis.danceState].tween.start();
+        alfonso.tweens[alfonso.danceState].tween.start();
+        melvarTheTerrible.tweens[melvarTheTerrible.danceState].tween.start();
 
         this.characters = {};
         this.characters.hubert = hubert;
-        this.characters.emmis = emmis;
+        this.characters.gourdis = gourdis;
 
         this.input.keyboard.addKey(Phaser.KeyCode.RIGHT).onDown.add(this.incrementSelectedSpot, this);
         this.input.keyboard.addKey(Phaser.KeyCode.LEFT).onDown.add(this.decrementSelectedSpot, this);

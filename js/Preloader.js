@@ -30,8 +30,15 @@ BasicGame.Preloader.prototype = {
         this.load.image('melvarTheTerrible', 'assets/img/Melvar_the_Terrible.png');
         this.load.image('firePit', 'assets/img/Firepit.png');
 
+        // Load our fire assets
+        this.load.spritesheet('largeFire', 'assets/img/FireSheet192x192.png', 192, 192, 5);
+        this.load.spritesheet('medFire', 'assets/img/FireSheetMed120x120.png', 120, 120, 5);
+        this.load.spritesheet('smallFire', 'assets/img/FireSheetSmall60x60.png', 60, 60, 5);
+
+        // Load the beach background
         this.load.image('background', 'assets/img/Background.png');
 
+        // Load the fire runes
         this.load.image('bopRune', 'assets/img/BopRune.png');
         this.load.image('chillaxRune', 'assets/img/ChillaxRune.png');
         this.load.image('twirlRune', 'assets/img/TwirlRune.png');
