@@ -139,6 +139,10 @@ BasicGame.Game.prototype = {
         this.campfireAudio = this.add.audio('campfire');
         this.campfireAudio.loop = true;
         this.campfireAudio.play();
+
+        this.runeActivatedAudio = this.add.audio('runeActivated');
+        this.messedUpAudio = this.add.audio('messedUp');
+        this.summonAudio = this.add.audio('summon');
     },
 
     shuffle: function(array) {
@@ -269,7 +273,7 @@ BasicGame.Game.prototype = {
             var rune = this.runes[index];
             if ((rune.state == runeStates.ARRIVED || rune.state == runeStates.DYING) && rune.targetSpotIndex == this.selectedSpot && rune.danceType == newDance) {
                 rune.state = runeStates.ACTIVATED;
-
+                this.runeActivatedAudio.play();
                 var position = new PIXI.Point(rune.sprite.position.x, rune.sprite.position.y);
                 rune.sprite.kill();
                 rune.sprite = this.getActivatedRuneSprite(rune.danceType, position);
@@ -319,6 +323,7 @@ BasicGame.Game.prototype = {
 
         if (!this.verifyDanceChoice(newDance)) {
             this.messedUp = true;
+            this.messedUpAudio.play();
         }
 
         // Stop the tween and call the stop callback to reset the position (which apparently doesn't work so hot)
@@ -360,6 +365,7 @@ BasicGame.Game.prototype = {
         if(i == this.runes.length && !this.addedWisdom) {
             for(i = 0; i < this.runes.length; i++) this.runes[i].state = runeStates.DEAD;
             // Do some effect to make runes disappear
+            this.summonAudio.play();
             if (this.messedUp) {
                 console.log("Hello, I'm yssug");
             } else {

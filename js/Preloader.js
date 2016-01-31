@@ -57,7 +57,9 @@ BasicGame.Preloader.prototype = {
         // Audio to sooth our stress away
         this.load.audio('ocean', ['assets/audio/ocean.mp3', 'assets/audio/ocean.ogg']);
         this.load.audio('campfire', ['assets/audio/campfire.mp3', 'assets/audio/campfire.ogg']);
-
+        this.load.audio('runeActivated', ['assets/audio/runeActivated.mp3', 'assets/audio/runeActivated.ogg']);
+        this.load.audio('messedUp', ['assets/audio/messedUp.mp3', 'assets/audio/messedUp.ogg']);
+        this.load.audio('summon', ['assets/audio/summon.mp3', 'assets/audio/summon.ogg']);
 	},
 
 	create: function () {
