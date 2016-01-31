@@ -60,10 +60,9 @@ BasicGame.Game.prototype = {
         this.messedUp = false;
         this.currentState = GameState.RUNNING;
         this.wisdomImparted = false;
-        this.textTween = this.add.tween(null);
-        this.textTween.to({alpha: 1}, 500, Phaser.Easing.Linear.None);
-        this.textTweenEnd = this.add.tween(null);
-        this.textTweenEnd.to({alpha: 0}, 500, Phaser.Easing.Linear.None);
+
+        this.wisdom = ["At night some stars come out, but some are too shy and stay in instead.", "We all keep killing time... It's no wonder time kills us all in the end.",
+                        "We live in the present, but the past lives in us."];
 
         var distToFire = 220;
         var spotYOffset = 220;
@@ -174,9 +173,6 @@ BasicGame.Game.prototype = {
         this.summonedText.setTextBounds(0, 0, 1024, 200);
         this.summonedText.visible = false;
         this.summonedText.alpha = 0;
-
-        this.textTween.target = this.summonedText;
-        this.textTweenEnd.target = this.summonedText;
     },
 
     shuffle: function(array) {
@@ -421,11 +417,11 @@ BasicGame.Game.prototype = {
             if(this.smoke.animations.currentAnim.frame == 4) {
                 this.summoned.visible = true; 
             } else if(this.smoke.animations.currentAnim.isFinished) {
-                this.wisdomImparted = true;
+                //this.wisdomImparted = true;
                 this.smoke.visible = false;
                 var textTween = this.add.tween(this.summonedText);
                 textTween.to({alpha: 1}, 500, Phaser.Easing.Linear.None);
-
+                /*
                 var textTweenEnd = this.add.tween(this.summonedText);
                 textTweenEnd.to({alpha: 0}, 500, Phaser.Easing.Linear.None, true, 5000);
                 textTweenEnd.onComplete.addOnce(function() {
@@ -440,8 +436,8 @@ BasicGame.Game.prototype = {
                     this.smoke.animations.play('coalesce', 11, false);
                 }, this);
 
-                textTween.chain(textTweenEnd);
-                this.textTween.start();
+                textTween.chain(textTweenEnd);*/
+                textTween.start();
             }
         } else {
             if(this.smoke.animations.currentAnim.frame == 4) {
@@ -460,10 +456,16 @@ BasicGame.Game.prototype = {
         this.summonAudio.play();
         if(succeeded) {
             this.summoned = this.gussy;
-            this.summonedText.setText("Very wise things here.");
+            this.summonedText.setText(this.wisdom[this.rnd.integerInRange(0, this.wisdom.length)]);
         } else {
             this.summoned = this.yssug;
-            this.summonedText.setText("Less wise things here.");
+            var text = this.wisdom[this.rnd.integerInRange(0, this.wisdom.length)];
+            text = text.split(" ");
+            text = this.shuffle(text);
+            var recombined = "";
+            for(var i = 0; i < text.length - 1; i++) recombined += text[i] + " ";
+            recombined += text[text.length - 1];
+            this.summonedText.setText(text);
         }
         this.summonedText.visible = true;
         this.smoke.visible = true;
