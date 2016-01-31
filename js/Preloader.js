@@ -28,6 +28,9 @@ BasicGame.Preloader.prototype = {
         this.load.image('gourdis', 'assets/img/Gourdis.png');
         this.load.image('alfonso', 'assets/img/Alfonso.png');
         this.load.image('melvarTheTerrible', 'assets/img/Melvar_the_Terrible.png');
+        this.load.image('clamdirk', 'assets/img/Clamdirk.png');
+        
+        this.load.image('demonAle', 'assets/img/DemonAle.png');
         this.load.image('firePit', 'assets/img/Firepit.png');
 
         // Load our fire assets

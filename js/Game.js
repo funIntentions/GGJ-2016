@@ -59,6 +59,7 @@ BasicGame.Game.prototype = {
         var firePit = this.add.sprite(this.world.centerX, this.world.centerY, 'firePit');
         firePit.anchor.setTo(0.5, 0.3);
 
+        // Load the fire spritesheets
         var outerFire = this.add.sprite(firePit.x, firePit.y, 'largeFire');
         outerFire.anchor.setTo(0.5, 0.7);
         outerFire.animations.add('burn');
@@ -84,6 +85,7 @@ BasicGame.Game.prototype = {
         this.placeInSpot(alfonso);
         this.placeInSpot(hubert);
 
+        // Lol hacky af
         hubert.addPositionDependentTweens(this);
         alfonso.addPositionDependentTweens(this);
         gourdis.addPositionDependentTweens(this);
@@ -94,9 +96,15 @@ BasicGame.Game.prototype = {
         alfonso.tweens[alfonso.danceState].tween.start();
         melvarTheTerrible.tweens[melvarTheTerrible.danceState].tween.start();
 
-        this.characters = {};
-        this.characters.hubert = hubert;
-        this.characters.gourdis = gourdis;
+        this.indicatorOffsets = [{x: this.spots[0].character.sprite.x + this.spots[0].character.sprite.width / 3, y: this.spots[0].character.sprite.y},
+                                 {x: this.spots[1].character.sprite.x + this.spots[1].character.sprite.width / 3, y: this.spots[1].character.sprite.y},
+                                 {x: this.spots[2].character.sprite.x + this.spots[2].character.sprite.width / 3, y: this.spots[2].character.sprite.y},
+                                 {x: this.spots[3].character.sprite.x + this.spots[3].character.sprite.width / 3, y: this.spots[3].character.sprite.y},];
+                                 //{x: this.spots[4].character.sprite.x + this.spots[4].character.sprite.x / 2, y: this.spots[4].character.sprite.y}];
+        
+        var currentOffset = this.indicatorOffsets[this.selectedSpot];
+        this.selectionIndicator = this.add.sprite(currentOffset.x, currentOffset.y, 'demonAle');
+        this.selectionIndicator.anchor.setTo(0.5, 0.5);
 
         this.input.keyboard.addKey(Phaser.KeyCode.RIGHT).onDown.add(this.incrementSelectedSpot, this);
         this.input.keyboard.addKey(Phaser.KeyCode.LEFT).onDown.add(this.decrementSelectedSpot, this);
@@ -222,6 +230,8 @@ BasicGame.Game.prototype = {
 
     incrementSelectedSpot: function() {
         this.selectedSpot = (this.selectedSpot + 1) % this.spots.length;
+        var newSelPos = this.indicatorOffsets[this.selectedSpot];
+        this.selectionIndicator.position.setTo(newSelPos.x, newSelPos.y);
     },
 
     /**
@@ -230,7 +240,9 @@ BasicGame.Game.prototype = {
     decrementSelectedSpot: function() {
         this.selectedSpot = (this.selectedSpot - 1) % this.spots.length;
 
-        if (this.selectedSpot < 0) {this.selectedSpot = 3;}
+        if (this.selectedSpot < 0) {this.selectedSpot = this.spots.length - 1;}
+        var newSelPos = this.indicatorOffsets[this.selectedSpot];
+        this.selectionIndicator.position.setTo(newSelPos.x, newSelPos.y);
     },
 
     verifyDanceChoice: function(newDance) {
