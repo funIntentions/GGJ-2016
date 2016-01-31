@@ -168,10 +168,16 @@ BasicGame.Game.prototype = {
     changeDanceForSelected: function(newDance) {
         var character = this.spots[this.selectedSpot].character;
         var pastDance = character.danceState;
-        character.tweens[pastDance].tween.stop(false);
+        // Stop the tween and call the stop callback to reset the position (which apparently doesn't work so hot)
+        character.tweens[pastDance].tween.pause();
         character.tweens[pastDance].stop();
         character.danceState = newDance;
-        character.tweens[newDance].tween.start();
+        if(character.tweens[newDance].tween.isRunning) {
+            character.tweens[newDance].tween.resume();
+        } else {
+            character.tweens[newDance].tween.start();
+        }
+        
     },
 
     chillaxDance: function() {

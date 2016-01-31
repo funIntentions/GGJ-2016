@@ -30,12 +30,12 @@ function Character(sprite, game, danceState) {
     this.sprite = sprite;
     this.sprite.anchor.setTo(0.5, 0.5);
     this.danceState = danceState || dances.CHILLAX;
-    this.initValues = {scale: {x: 1, y:  1}, rotation: sprite.rotation, pos: {x: sprite.position.x, y: sprite.position.y}};
+    this.initValues = {scale: {x: 1, y:  1}, rotation: sprite.rotation};
 
     var that = this;
     this.tweens = [];
 
-    var chillaxStop = function() {that.sprite.scale = {x: that.initValues.scale.x, y: that.initValues.scale.y};};
+    var chillaxStop = function() {that.sprite.scale.x = that.initValues.scale.x; that.sprite.scale.y = that.initValues.scale.y;};
     var twirlStop = function() {that.sprite.rotation = that.initValues.rotation};
 
     addDanceTween(game, this, {target: that.sprite.scale,
@@ -53,8 +53,9 @@ function Character(sprite, game, danceState) {
 Character.prototype.addPositionDependentTweens = function(game) {
 
     var that = this;
-    var wiggleStop = function() {that.sprite.position.x = that.initValues.pos.x};
-    var bopStop = function() {that.sprite.position.y = that.initValues.pos.y};
+    that.initValues.pos = {x: that.sprite.x, y: that.sprite.y};
+    var wiggleStop = function() {that.sprite.position.x = that.initValues.pos.x; that.sprite.position.y = that.initValues.pos.y; console.log(that.sprite.position);};
+    var bopStop = function() {that.sprite.position.x = that.initValues.pos.x; that.sprite.position.y = that.initValues.pos.y; console.log(that.sprite.position);};
 
     addDanceTween(game, this, {target: that.sprite,
                                targetVal: {x: '+30'},
