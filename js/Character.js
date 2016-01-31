@@ -2,7 +2,8 @@ dances = {
     CHILLAX: 0,
     WIGGLE: 1,
     BOP: 2,
-    TWIRL: 3
+    TWIRL: 3,
+    DANCE_COUNT: 4
 };
 
 /**

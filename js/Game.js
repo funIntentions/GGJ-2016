@@ -41,7 +41,12 @@ BasicGame.Game.prototype = {
 
     create: function () {
         this.spots = [];
+        this.runes = [];
         this.selectedSpot = 0;
+        this.spawnMin = 10;
+        this.spawnMax = 15;
+        this.runeLifeTime = 6;
+        this.runeYOffset = 100;
 
         var distToFire = 100;
 
@@ -75,6 +80,58 @@ BasicGame.Game.prototype = {
         this.input.keyboard.addKey(Phaser.KeyCode.X).onDown.add(this.wiggleDance, this);
         this.input.keyboard.addKey(Phaser.KeyCode.C).onDown.add(this.bopDance, this);
         this.input.keyboard.addKey(Phaser.KeyCode.V).onDown.add(this.twirlDance, this);
+
+        this.time.events.add(Phaser.Timer.SECOND * this.spawnMin, this.spawnFireRune, this);
+    },
+
+    spawnFireRune: function() {
+        var fireSpot = this.rnd.integerInRange(0, this.spots.length - 1);
+        var danceType = this.rnd.integerInRange(0, dances.DANCE_COUNT - 1);
+        var runeSprite = this.add.sprite(this.world.centerX, this.world.centerY, 'hubert');
+        runeSprite.anchor.setTo(0.5, 0.5);
+        runeSprite.scale.setTo(0.25);
+        var rune = new FireRune(runeSprite, new PIXI.Point(this.spots[fireSpot].position.x, this.spots[fireSpot].position.y - this.runeYOffset), this.runeLifeTime, danceType);
+        this.runes.push(rune);
+        this.add.tween(runeSprite).to({x: rune.targetPosition.x, y: rune.targetPosition.y}, 5000, 'Linear', true);
+        var secondsUntilNextRune = this.rnd.integerInRange(this.spawnMin, this.spawnMax);
+        this.time.events.add(Phaser.Timer.SECOND * secondsUntilNextRune, this.spawnFireRune, this);
+    },
+
+    updateRunes: function() {
+        var index;
+        var runesToDestroy = [];
+
+        for (index = 0; index < this.runes.length; index++) {
+            var rune = this.runes[index];
+            switch (rune.state) {
+                case runeStates.MOVING:
+                    if (rune.sprite.position.distance(rune.targetPosition) < 0.1) {
+                        rune.state = runeStates.ARRIVED;
+                    }
+                    break;
+                case runeStates.ARRIVED:
+                    rune.lifeTime -= this.time.physicsElapsed;
+                    if (rune.lifeTime < 3) {
+                        this.add.tween(rune.sprite).to({alpha: 0}, 1000, 'Linear', true, 0, -1, true);
+                        rune.state = runeStates.DYING;
+                    }
+                    break;
+                case runeStates.DYING:
+                    rune.lifeTime -= this.time.physicsElapsed;
+                    if (rune.lifeTime < 0) {
+                        runesToDestroy.push(rune);
+                    }
+                break;
+                default:
+                console.log("oops...")
+            }
+        }
+
+        for (index = 0; index < runesToDestroy.length; index++) {
+            var indexOf = this.runes.indexOf(runesToDestroy[index]);
+            var removedRune = this.runes.splice(indexOf, 1)[0];
+            removedRune.sprite.kill();
+        }
     },
 
     incrementSelectedSpot: function() {
@@ -104,7 +161,7 @@ BasicGame.Game.prototype = {
     },
 
     update: function () {
-        
+        this.updateRunes();
     },
 
     quitGame: function (pointer) {
