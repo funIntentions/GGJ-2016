@@ -58,7 +58,7 @@ BasicGame.Game.prototype = {
 
         var background = this.add.sprite(0, 0, 'background');
         var hubert = new Character(this.add.sprite(0, 0, 'hubert'), this);
-        var emmis = new Character(this.add.sprite(0, 0, 'gourdis'), this, dances.BOP);
+        var emmis = new Character(this.add.sprite(0, 0, 'gourdis'), this);
 
         this.placeInSpot(hubert);
         this.placeInSpot(emmis);
