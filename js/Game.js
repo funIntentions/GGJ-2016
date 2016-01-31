@@ -48,7 +48,7 @@ BasicGame.Game.prototype = {
         this.runeLifeTime = 6;
         this.runeYOffset = 130;
 
-        var distToFire = 260;
+        var distToFire = 240;
 
         this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX, this.world.centerY + distToFire), false, null));
         this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX, this.world.centerY - distToFire), false, null));
@@ -56,13 +56,17 @@ BasicGame.Game.prototype = {
         this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX + distToFire, this.world.centerY), false, null));
 
         var background = this.add.sprite(0, 0, 'background');
-        var firePit = this.add.sprite(0, 0, 'firePit');
-        var Alfonso = new Character(this.add.sprite(0, 0, 'alfonso'), this);
+        var firePit = this.add.sprite(this.world.centerX, this.world.centerY, 'firePit');
+        firePit.anchor.setTo(0.5, 0.3);
+        var melvarTheTerrible = new Character(this.add.sprite(0, 0, 'melvarTheTerrible'), this);
+        var alfonso = new Character(this.add.sprite(0, 0, 'alfonso'), this);
         var hubert = new Character(this.add.sprite(0, 0, 'hubert'), this);
         var emmis = new Character(this.add.sprite(0, 0, 'gourdis'), this);
 
         this.placeInSpot(hubert);
         this.placeInSpot(emmis);
+        this.placeInSpot(alfonso);
+        this.placeInSpot(melvarTheTerrible);
 
         hubert.addPositionDependentTweens(this);
         emmis.addPositionDependentTweens(this);
