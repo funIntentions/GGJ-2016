@@ -27,12 +27,10 @@ BasicGame.Game = function (game) {
 BasicGame.Game.prototype = {
 
     placeInSpot: function(character) {
-        var scale = 0.25;
+        var scale = 1;
         var index;
         for (index = 0; index < this.spots.length; index++) {
             if (!this.spots[index].character) {
-                console.log(this.spots[index]);
-                character.sprite.anchor.setTo(0.5, 0.5);
                 character.sprite.scale.setTo(this.spots[index].flip ? -scale : scale, scale)
                 character.sprite.position = this.spots[index].position;
                 this.spots[index].character = character;
@@ -54,11 +52,21 @@ BasicGame.Game.prototype = {
 
 
         var background = this.add.sprite(0, 0, 'background');
-        var hubert = new Character(this.add.sprite(0, 0, 'hubert'));
-        var emmis = new Character(this.add.sprite(0, 0, 'hubert'));
+        var hubert = new Character(this.add.sprite(0, 0, 'hubert'), this);
+        var emmis = new Character(this.add.sprite(0, 0, 'gourdis'), this, dances.BOP);
 
         this.placeInSpot(hubert);
         this.placeInSpot(emmis);
+
+        hubert.addPositionDependentTweens(this);
+        emmis.addPositionDependentTweens(this);
+
+        hubert.tweens[hubert.danceState].tween.start();
+        emmis.tweens[emmis.danceState].tween.start();
+
+        this.characters = {};
+        this.characters.hubert = hubert;
+        this.characters.emmis = emmis;
 
         this.input.keyboard.addKey(Phaser.KeyCode.RIGHT).onDown.add(this.incrementSelectedSpot, this);
         this.input.keyboard.addKey(Phaser.KeyCode.LEFT).onDown.add(this.decrementSelectedSpot, this);
@@ -96,6 +104,7 @@ BasicGame.Game.prototype = {
     },
 
     update: function () {
+        
     },
 
     quitGame: function (pointer) {
