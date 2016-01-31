@@ -43,8 +43,8 @@ BasicGame.Game.prototype = {
         this.spots = [];
         this.runes = [];
         this.selectedSpot = 0;
-        this.spawnMin = 10;
-        this.spawnMax = 15;
+        this.spawnMin = 4;
+        this.spawnMax = 5;
         this.runeLifeTime = 6;
         this.runeYOffset = 130;
 
@@ -233,11 +233,13 @@ BasicGame.Game.prototype = {
         var index;
         for (index = 0; index < this.runes.length; index++) {
             var rune = this.runes[index];
-            console.log(rune);
-            console.log(this.selectedSpot);
-            console.log(newDance);
             if (rune.targetSpotIndex == this.selectedSpot && rune.danceType == newDance) {
                 rune.state = runeStates.ACTIVATED;
+
+                var position = new PIXI.Point(rune.sprite.position.x, rune.sprite.position.y);
+                rune.sprite.kill();
+                rune.sprite = this.getActivatedRuneSprite(rune.danceType, position);
+
                 return true;
             }
         }
@@ -249,6 +251,34 @@ BasicGame.Game.prototype = {
         this.initSpotChoices();
 
         return false;
+    },
+
+    getActivatedRuneSprite: function(danceType, position) {
+        var runeSprite = null;
+        console.log(position);
+        switch(danceType) {
+            case dances.CHILLAX:
+                runeSprite = this.add.sprite(position.x, position.y, 'chillaxRuneSuccess');
+                console.log(danceType);
+                break;
+            case dances.WIGGLE:
+                runeSprite = this.add.sprite(position.x, position.y, 'wiggleRuneSuccess');
+                console.log(danceType);
+                break;
+            case dances.BOP:
+                runeSprite = this.add.sprite(position.x, position.y, 'bopRuneSuccess');
+                console.log(danceType);
+                break;
+            case dances.TWIRL:
+                runeSprite = this.add.sprite(position.x, position.y, 'twirlRuneSuccess');
+                console.log(danceType);
+                break;
+            default:
+                runeSprite = this.add.sprite(position.x, position.y, 'hubert');
+                console.log("Unknown dance type...")
+        }
+        runeSprite.anchor.setTo(0.5, 0.5);
+        return runeSprite;
     },
 
     /**

@@ -43,6 +43,10 @@ BasicGame.Preloader.prototype = {
         this.load.image('chillaxRune', 'assets/img/ChillaxRune.png');
         this.load.image('twirlRune', 'assets/img/TwirlRune.png');
         this.load.image('wiggleRune', 'assets/img/WiggleRune.png');
+        this.load.image('bopRuneSuccess', 'assets/img/BopRuneSuccess.png');
+        this.load.image('chillaxRuneSuccess', 'assets/img/ChillaxRuneSuccess.png');
+        this.load.image('twirlRuneSuccess', 'assets/img/TwirlRuneSuccess.png');
+        this.load.image('wiggleRuneSuccess', 'assets/img/WiggleRuneSuccess.png');
 
 	},
 
