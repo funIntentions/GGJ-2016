@@ -138,6 +138,9 @@ BasicGame.Game.prototype = {
         this.time.events.add(Phaser.Timer.SECOND * secondsUntilNextRune, this.spawnFireRune, this);
     },
 
+    /**
+     * Updates the states and positions of all currently active runes.
+     */
     updateRunes: function() {
         var index;
         var runesToDestroy = [];
@@ -179,12 +182,20 @@ BasicGame.Game.prototype = {
         this.selectedSpot = (this.selectedSpot + 1) % this.spots.length;
     },
 
+    /**
+     * Changes the currently selected character to the "previous" spot.
+     */
     decrementSelectedSpot: function() {
         this.selectedSpot = (this.selectedSpot - 1) % this.spots.length;
 
         if (this.selectedSpot < 0) {this.selectedSpot = 3;}
     },
 
+    /**
+     * Changes the dance state for the currently selected character to the given dance.
+     *
+     * @param newDance The new dance state to assig.
+     */
     changeDanceForSelected: function(newDance) {
         var character = this.spots[this.selectedSpot].character;
         var pastDance = character.danceState;
