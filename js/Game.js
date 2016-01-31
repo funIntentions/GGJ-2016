@@ -42,6 +42,7 @@ BasicGame.Game.prototype = {
     create: function () {
         this.spots = [];
         this.runes = [];
+        this.spotChoices = [];
         this.selectedSpot = 0;
         this.spawnMin = 4;
         this.spawnMax = 5;
@@ -50,6 +51,7 @@ BasicGame.Game.prototype = {
         this.requiredWisdom = 5;
         this.currentWisdom = 0;
         this.addedWisdom = false; // Whether we've added wisdom for a successful dance arrangement
+        this.messedUp = false;
 
         var distToFire = 220;
         var spotYOffset = 220;
@@ -123,7 +125,11 @@ BasicGame.Game.prototype = {
         this.input.keyboard.addKey(Phaser.KeyCode.C).onDown.add(this.bopDance, this);
         this.input.keyboard.addKey(Phaser.KeyCode.V).onDown.add(this.twirlDance, this);
 
-        this.initSpotChoices();
+        var index;
+        for (index = 0; index < this.spots.length; index++) {
+            this.spotChoices.push(index);
+        }
+
         this.time.events.add(Phaser.Timer.SECOND * this.spawnMin, this.spawnFireRune, this);
     },
 
@@ -146,14 +152,6 @@ BasicGame.Game.prototype = {
       return array;
     },
 
-    initSpotChoices: function() {
-        this.spotChoices = [];
-        var index;
-        for (index = 0; index < this.spots.length; index++) {
-            this.spotChoices.push(index);
-        }
-    },
-
     spawnFireRune: function() {
 
         var secondsUntilNextRune = this.rnd.integerInRange(this.spawnMin, this.spawnMax);
@@ -161,6 +159,7 @@ BasicGame.Game.prototype = {
 
         if (this.spotChoices.length == 0) {
             return false;
+            console.log("no spots");
         }
 
         this.shuffle(this.spotChoices);
@@ -188,7 +187,7 @@ BasicGame.Game.prototype = {
         runeSprite.anchor.setTo(0.5, 0.5);
         var rune = new FireRune(runeSprite, fireSpot, new PIXI.Point(this.spots[fireSpot].position.x, this.spots[fireSpot].position.y - this.runeYOffset), this.runeLifeTime, danceType);
         this.runes.push(rune);
-        this.add.tween(runeSprite).to({x: rune.targetPosition.x, y: rune.targetPosition.y}, 5000, 'Linear', true);
+        this.add.tween(runeSprite).to({x: rune.targetPosition.x, y: rune.targetPosition.y}, 1000, 'Linear', true);
         return true;
     },
 
@@ -233,7 +232,9 @@ BasicGame.Game.prototype = {
         for (index = 0; index < runesToDestroy.length; index++) {
             var indexOf = this.runes.indexOf(runesToDestroy[index]);
             var removedRune = this.runes.splice(indexOf, 1)[0];
+            this.spotChoices.push(removedRune.targetSpotIndex);
             removedRune.sprite.kill();
+
         }
     },
 
@@ -258,7 +259,7 @@ BasicGame.Game.prototype = {
         var index;
         for (index = 0; index < this.runes.length; index++) {
             var rune = this.runes[index];
-            if (rune.state == runeStates.ARRIVED && rune.targetSpotIndex == this.selectedSpot && rune.danceType == newDance) {
+            if ((rune.state == runeStates.ARRIVED || rune.state == runeStates.DYING) && rune.targetSpotIndex == this.selectedSpot && rune.danceType == newDance) {
                 rune.state = runeStates.ACTIVATED;
 
                 var position = new PIXI.Point(rune.sprite.position.x, rune.sprite.position.y);
@@ -272,8 +273,6 @@ BasicGame.Game.prototype = {
         for (index = 0; index < this.runes.length; index++) {
             this.runes[index].state = runeStates.DEAD;
         }
-
-        this.initSpotChoices();
 
         return false;
     },
@@ -310,7 +309,9 @@ BasicGame.Game.prototype = {
         var character = this.spots[this.selectedSpot].character;
         var pastDance = character.danceState;
 
-        this.verifyDanceChoice(newDance);
+        if (!this.verifyDanceChoice(newDance)) {
+            this.messedUp = true;
+        }
 
         // Stop the tween and call the stop callback to reset the position (which apparently doesn't work so hot)
         character.tweens[pastDance].tween.pause();
@@ -349,7 +350,13 @@ BasicGame.Game.prototype = {
         var i;
         for(i = 0; i < this.runes.length; i++) if(this.runes[i].state != runeStates.ACTIVATED) break;
         if(i == this.runes.length && !this.addedWisdom) {
+            for(i = 0; i < this.runes.length; i++) this.runes[i].state = runeStates.DEAD;
             // Do some effect to make runes disappear
+            if (this.messedUp) {
+                console.log("Hello, I'm yssug");
+            } else {
+                console.log("Hello, I'm gussy");
+            }
             // Summon gussy
             // Impart wisdom
             this.currentWisdom++;
