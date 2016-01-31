@@ -55,7 +55,6 @@ BasicGame.Game.prototype = {
         this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX - distToFire, this.world.centerY), true, null));
         this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX + distToFire, this.world.centerY), false, null));
 
-
         var background = this.add.sprite(0, 0, 'background');
         var hubert = new Character(this.add.sprite(0, 0, 'hubert'), this);
         var emmis = new Character(this.add.sprite(0, 0, 'gourdis'), this, dances.BOP);
@@ -87,9 +86,25 @@ BasicGame.Game.prototype = {
     spawnFireRune: function() {
         var fireSpot = this.rnd.integerInRange(0, this.spots.length - 1);
         var danceType = this.rnd.integerInRange(0, dances.DANCE_COUNT - 1);
-        var runeSprite = this.add.sprite(this.world.centerX, this.world.centerY, 'hubert');
+        var runeSprite = null;
+        switch(danceType) {
+            case dances.CHILLAX:
+                var runeSprite = this.add.sprite(this.world.centerX, this.world.centerY, 'chillaxRune');
+                break;
+            case dances.WIGGLE:
+                var runeSprite = this.add.sprite(this.world.centerX, this.world.centerY, 'wiggleRune');
+                break;
+            case dances.BOP:
+                var runeSprite = this.add.sprite(this.world.centerX, this.world.centerY, 'bopRune');
+                break;
+            case dances.TWIRL:
+                var runeSprite = this.add.sprite(this.world.centerX, this.world.centerY, 'twirlRune');
+                break;
+            default:
+                var runeSprite = this.add.sprite(this.world.centerX, this.world.centerY, 'hubert');
+                console.log("Unknown dance type...")
+        }
         runeSprite.anchor.setTo(0.5, 0.5);
-        runeSprite.scale.setTo(0.25);
         var rune = new FireRune(runeSprite, new PIXI.Point(this.spots[fireSpot].position.x, this.spots[fireSpot].position.y - this.runeYOffset), this.runeLifeTime, danceType);
         this.runes.push(rune);
         this.add.tween(runeSprite).to({x: rune.targetPosition.x, y: rune.targetPosition.y}, 5000, 'Linear', true);
@@ -123,7 +138,7 @@ BasicGame.Game.prototype = {
                     }
                 break;
                 default:
-                console.log("oops...")
+                console.log("Unknown rune state...")
             }
         }
 
