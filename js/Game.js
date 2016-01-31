@@ -46,9 +46,9 @@ BasicGame.Game.prototype = {
         this.spawnMin = 10;
         this.spawnMax = 15;
         this.runeLifeTime = 6;
-        this.runeYOffset = 100;
+        this.runeYOffset = 130;
 
-        var distToFire = 100;
+        var distToFire = 260;
 
         this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX, this.world.centerY + distToFire), false, null));
         this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX, this.world.centerY - distToFire), false, null));
@@ -56,8 +56,10 @@ BasicGame.Game.prototype = {
         this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX + distToFire, this.world.centerY), false, null));
 
         var background = this.add.sprite(0, 0, 'background');
+        var firePit = this.add.sprite(0, 0, 'firePit');
+        var Alfonso = new Character(this.add.sprite(0, 0, 'alfonso'), this);
         var hubert = new Character(this.add.sprite(0, 0, 'hubert'), this);
-        var emmis = new Character(this.add.sprite(0, 0, 'gourdis'), this, dances.BOP);
+        var emmis = new Character(this.add.sprite(0, 0, 'gourdis'), this);
 
         this.placeInSpot(hubert);
         this.placeInSpot(emmis);
@@ -159,20 +161,29 @@ BasicGame.Game.prototype = {
         if (this.selectedSpot < 0) {this.selectedSpot = 3;}
     },
 
+    changeDanceForSelected: function(newDance) {
+        var character = this.spots[this.selectedSpot].character;
+        var pastDance = character.danceState;
+        character.tweens[pastDance].tween.stop(false);
+        character.tweens[pastDance].stop();
+        character.danceState = newDance;
+        character.tweens[newDance].tween.start();
+    },
+
     chillaxDance: function() {
-        this.spots[this.selectedSpot].character.danceState = dances.CHILLAX;
+        this.changeDanceForSelected(dances.CHILLAX);
     },
 
     wiggleDance: function() {
-        this.spots[this.selectedSpot].character.danceState = dances.WIGGLE;
+        this.changeDanceForSelected(dances.WIGGLE);
     },
 
     bopDance: function() {
-        this.spots[this.selectedSpot].character.danceState = dances.BOP;
+        this.changeDanceForSelected(dances.BOP);
     },
 
     twirlDance: function() {
-        this.spots[this.selectedSpot].character.danceState = dances.TWIRL;
+        this.changeDanceForSelected(dances.TWIRL);
     },
 
     update: function () {
