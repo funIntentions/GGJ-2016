@@ -43,20 +43,22 @@ BasicGame.Game.prototype = {
         this.spots = [];
         this.runes = [];
         this.selectedSpot = 0;
-        this.spawnMin = 10;
-        this.spawnMax = 15;
+        this.spawnMin = 4;
+        this.spawnMax = 5;
         this.runeLifeTime = 6;
         this.runeYOffset = 130;
         this.requiredWisdom = 5;
         this.currentWisdom = 0;
         this.addedWisdom = false; // Whether we've added wisdom for a successful dance arrangement
 
-        var distToFire = 240;
+        var distToFire = 220;
+        var spotYOffset = 220;
 
         this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX, this.world.centerY + distToFire), false, null));
-        this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX, this.world.centerY - distToFire), false, null));
-        this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX - distToFire, this.world.centerY), false, null));
-        this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX + distToFire, this.world.centerY), false, null));
+        this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX - distToFire, this.world.centerY - spotYOffset/2), false, null));
+        this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX - distToFire, this.world.centerY + spotYOffset/2), false, null));
+        this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX + distToFire, this.world.centerY - spotYOffset/2), false, null));
+        this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX + distToFire, this.world.centerY + spotYOffset/2), false, null));
 
         var background = this.add.sprite(0, 0, 'background');
         var firePit = this.add.sprite(this.world.centerX, this.world.centerY, 'firePit');
@@ -82,29 +84,33 @@ BasicGame.Game.prototype = {
         var alfonso = new Character(this.add.sprite(0, 0, 'alfonso'), this);
         var hubert = new Character(this.add.sprite(0, 0, 'hubert'), this);
         var gourdis = new Character(this.add.sprite(0, 0, 'gourdis'), this);
+        var clamdirk = new Character(this.add.sprite(0, 0, 'clamdirk'), this);
 
         this.placeInSpot(melvarTheTerrible);
         this.placeInSpot(gourdis);
         this.placeInSpot(alfonso);
         this.placeInSpot(hubert);
+        this.placeInSpot(clamdirk);
 
         // Lol hacky af
         hubert.addPositionDependentTweens(this);
         alfonso.addPositionDependentTweens(this);
         gourdis.addPositionDependentTweens(this);
         melvarTheTerrible.addPositionDependentTweens(this);
+        clamdirk.addPositionDependentTweens(this);
 
         hubert.tweens[hubert.danceState].tween.start();
         gourdis.tweens[gourdis.danceState].tween.start();
         alfonso.tweens[alfonso.danceState].tween.start();
         melvarTheTerrible.tweens[melvarTheTerrible.danceState].tween.start();
+        clamdirk.tweens[clamdirk.danceState].tween.start();
 
         this.indicatorOffsets = [{x: this.spots[0].character.sprite.x + this.spots[0].character.sprite.width / 3, y: this.spots[0].character.sprite.y},
                                  {x: this.spots[1].character.sprite.x + this.spots[1].character.sprite.width / 3, y: this.spots[1].character.sprite.y},
                                  {x: this.spots[2].character.sprite.x + this.spots[2].character.sprite.width / 3, y: this.spots[2].character.sprite.y},
-                                 {x: this.spots[3].character.sprite.x + this.spots[3].character.sprite.width / 3, y: this.spots[3].character.sprite.y},];
-                                 //{x: this.spots[4].character.sprite.x + this.spots[4].character.sprite.x / 2, y: this.spots[4].character.sprite.y}];
-        
+                                 {x: this.spots[3].character.sprite.x + this.spots[3].character.sprite.width / 3, y: this.spots[3].character.sprite.y},
+                                 {x: this.spots[4].character.sprite.x + this.spots[4].character.sprite.width / 3, y: this.spots[4].character.sprite.y}];
+
         var currentOffset = this.indicatorOffsets[this.selectedSpot];
         this.selectionIndicator = this.add.sprite(currentOffset.x, currentOffset.y, 'demonAle');
         this.selectionIndicator.anchor.setTo(0.5, 0.5);
@@ -149,6 +155,10 @@ BasicGame.Game.prototype = {
     },
 
     spawnFireRune: function() {
+
+        var secondsUntilNextRune = this.rnd.integerInRange(this.spawnMin, this.spawnMax);
+        this.time.events.add(Phaser.Timer.SECOND * secondsUntilNextRune, this.spawnFireRune, this);
+
         if (this.spotChoices.length == 0) {
             return false;
         }
@@ -179,9 +189,6 @@ BasicGame.Game.prototype = {
         var rune = new FireRune(runeSprite, fireSpot, new PIXI.Point(this.spots[fireSpot].position.x, this.spots[fireSpot].position.y - this.runeYOffset), this.runeLifeTime, danceType);
         this.runes.push(rune);
         this.add.tween(runeSprite).to({x: rune.targetPosition.x, y: rune.targetPosition.y}, 5000, 'Linear', true);
-        var secondsUntilNextRune = this.rnd.integerInRange(this.spawnMin, this.spawnMax);
-        this.time.events.add(Phaser.Timer.SECOND * secondsUntilNextRune, this.spawnFireRune, this);
-
         return true;
     },
 
@@ -212,8 +219,11 @@ BasicGame.Game.prototype = {
                 case runeStates.DYING:
                     rune.lifeTime -= this.time.physicsElapsed;
                     if (rune.lifeTime < 0) {
-                        runesToDestroy.push(rune);
+                        rune.state = runeStates.DEAD;
                     }
+                break;
+                case runeStates.DEAD:
+                    runesToDestroy.push(rune);
                 break;
                 default:
                 console.log("Unknown rune state...")
@@ -248,22 +258,47 @@ BasicGame.Game.prototype = {
         var index;
         for (index = 0; index < this.runes.length; index++) {
             var rune = this.runes[index];
-            console.log(rune);
-            console.log(this.selectedSpot);
-            console.log(newDance);
-            if (rune.targetSpotIndex == this.selectedSpot && rune.danceType == newDance) {
+            if (rune.state == runeStates.ARRIVED && rune.targetSpotIndex == this.selectedSpot && rune.danceType == newDance) {
                 rune.state = runeStates.ACTIVATED;
+
+                var position = new PIXI.Point(rune.sprite.position.x, rune.sprite.position.y);
+                rune.sprite.kill();
+                rune.sprite = this.getActivatedRuneSprite(rune.danceType, position);
+
                 return true;
             }
         }
 
         for (index = 0; index < this.runes.length; index++) {
-            this.runes[index].state = runeStates.DYING;
+            this.runes[index].state = runeStates.DEAD;
         }
 
         this.initSpotChoices();
 
         return false;
+    },
+
+    getActivatedRuneSprite: function(danceType, position) {
+        var runeSprite = null;
+        switch(danceType) {
+            case dances.CHILLAX:
+                runeSprite = this.add.sprite(position.x, position.y, 'chillaxRuneSuccess');
+                break;
+            case dances.WIGGLE:
+                runeSprite = this.add.sprite(position.x, position.y, 'wiggleRuneSuccess');
+                break;
+            case dances.BOP:
+                runeSprite = this.add.sprite(position.x, position.y, 'bopRuneSuccess');
+                break;
+            case dances.TWIRL:
+                runeSprite = this.add.sprite(position.x, position.y, 'twirlRuneSuccess');
+                break;
+            default:
+                runeSprite = this.add.sprite(position.x, position.y, 'hubert');
+                console.log("Unknown dance type...")
+        }
+        runeSprite.anchor.setTo(0.5, 0.5);
+        return runeSprite;
     },
 
     /**
@@ -275,7 +310,7 @@ BasicGame.Game.prototype = {
         var character = this.spots[this.selectedSpot].character;
         var pastDance = character.danceState;
 
-        console.log (this.verifyDanceChoice(newDance));
+        this.verifyDanceChoice(newDance);
 
         // Stop the tween and call the stop callback to reset the position (which apparently doesn't work so hot)
         character.tweens[pastDance].tween.pause();
