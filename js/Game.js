@@ -131,6 +131,14 @@ BasicGame.Game.prototype = {
         }
 
         this.time.events.add(Phaser.Timer.SECOND * this.spawnMin, this.spawnFireRune, this);
+
+        this.oceanAudio = this.add.audio('ocean');
+        this.oceanAudio.loop = true;
+        this.oceanAudio.play();
+
+        this.campfireAudio = this.add.audio('campfire');
+        this.campfireAudio.loop = true;
+        this.campfireAudio.play();
     },
 
     shuffle: function(array) {

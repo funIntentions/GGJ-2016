@@ -29,7 +29,7 @@ BasicGame.Preloader.prototype = {
         this.load.image('alfonso', 'assets/img/Alfonso.png');
         this.load.image('melvarTheTerrible', 'assets/img/Melvar_the_Terrible.png');
         this.load.image('clamdirk', 'assets/img/Clamdirk.png');
-        
+
         this.load.image('demonAle', 'assets/img/DemonAle.png');
         this.load.image('firePit', 'assets/img/Firepit.png');
 
@@ -53,6 +53,10 @@ BasicGame.Preloader.prototype = {
 
         // Load gussy for our beautiful summoning
         this.load.image('gussy', 'assets/img/Gussy.png');
+
+        // Audio to sooth our stress away
+        this.load.audio('ocean', ['assets/audio/ocean.mp3', 'assets/audio/ocean.ogg']);
+        this.load.audio('campfire', ['assets/audio/campfire.mp3', 'assets/audio/campfire.ogg']);
 
 	},
 
