@@ -27,7 +27,14 @@ BasicGame.Preloader.prototype = {
 		this.load.image('hubert', 'assets/img/Hubert.png');
         this.load.image('gourdis', 'assets/img/Gourdis.png');
         this.load.image('alfonso', 'assets/img/Alfonso.png');
+        this.load.image('firePit', 'assets/img/Firepit.png');
+
         this.load.image('background', 'assets/img/Background.png');
+
+        this.load.image('bopRune', 'assets/img/BopRune.png');
+        this.load.image('chillaxRune', 'assets/img/ChillaxRune.png');
+        this.load.image('twirlRune', 'assets/img/TwirlRune.png');
+        this.load.image('wiggleRune', 'assets/img/WiggleRune.png');
 
 	},
 
