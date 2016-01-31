@@ -106,11 +106,44 @@ BasicGame.Game.prototype = {
         this.input.keyboard.addKey(Phaser.KeyCode.C).onDown.add(this.bopDance, this);
         this.input.keyboard.addKey(Phaser.KeyCode.V).onDown.add(this.twirlDance, this);
 
+        this.initSpotChoices();
         this.time.events.add(Phaser.Timer.SECOND * this.spawnMin, this.spawnFireRune, this);
     },
 
+    shuffle: function(array) {
+      var currentIndex = array.length, temporaryValue, randomIndex;
+
+      // While there remain elements to shuffle...
+      while (0 !== currentIndex) {
+
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+      }
+
+      return array;
+    },
+
+    initSpotChoices: function() {
+        this.spotChoices = [];
+        var index;
+        for (index = 0; index < this.spots.length; index++) {
+            this.spotChoices.push(index);
+        }
+    },
+
     spawnFireRune: function() {
-        var fireSpot = this.rnd.integerInRange(0, this.spots.length - 1);
+        if (this.spotChoices.length == 0) {
+            return false;
+        }
+
+        this.shuffle(this.spotChoices);
+        var fireSpot = this.spotChoices.pop();
         var danceType = this.rnd.integerInRange(0, dances.DANCE_COUNT - 1);
         var runeSprite = null;
         switch(danceType) {
@@ -130,12 +163,15 @@ BasicGame.Game.prototype = {
                 var runeSprite = this.add.sprite(this.world.centerX, this.world.centerY, 'hubert');
                 console.log("Unknown dance type...")
         }
+
         runeSprite.anchor.setTo(0.5, 0.5);
         var rune = new FireRune(runeSprite, fireSpot, new PIXI.Point(this.spots[fireSpot].position.x, this.spots[fireSpot].position.y - this.runeYOffset), this.runeLifeTime, danceType);
         this.runes.push(rune);
         this.add.tween(runeSprite).to({x: rune.targetPosition.x, y: rune.targetPosition.y}, 5000, 'Linear', true);
         var secondsUntilNextRune = this.rnd.integerInRange(this.spawnMin, this.spawnMax);
         this.time.events.add(Phaser.Timer.SECOND * secondsUntilNextRune, this.spawnFireRune, this);
+
+        return true;
     },
 
     updateRunes: function() {
@@ -203,6 +239,8 @@ BasicGame.Game.prototype = {
         for (index = 0; index < this.runes.length; index++) {
             this.runes[index].state = runeStates.DYING;
         }
+
+        this.initSpotChoices();
 
         return false;
     },
