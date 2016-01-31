@@ -1,11 +1,13 @@
 runeStates = {
     MOVING: 0,
     ARRIVED: 1,
-    DYING: 2
+    DYING: 2,
+    ACTIVATED: 3
 };
 
-function FireRune(sprite, targetPosition, lifeTime, danceType) {
+function FireRune(sprite, targetSpotIndex, targetPosition, lifeTime, danceType) {
     this.sprite = sprite;
+    this.targetSpotIndex = targetSpotIndex;
     this.targetPosition = targetPosition;
     this.lifeTime = lifeTime;
     this.danceType = danceType || dances.CHILLAX;

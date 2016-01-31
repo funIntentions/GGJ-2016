@@ -54,8 +54,8 @@ Character.prototype.addPositionDependentTweens = function(game) {
 
     var that = this;
     that.initValues.pos = {x: that.sprite.x, y: that.sprite.y};
-    var wiggleStop = function() {that.sprite.position.x = that.initValues.pos.x; that.sprite.position.y = that.initValues.pos.y; console.log(that.sprite.position);};
-    var bopStop = function() {that.sprite.position.x = that.initValues.pos.x; that.sprite.position.y = that.initValues.pos.y; console.log(that.sprite.position);};
+    var wiggleStop = function() {that.sprite.position.x = that.initValues.pos.x; that.sprite.position.y = that.initValues.pos.y;};
+    var bopStop = function() {that.sprite.position.x = that.initValues.pos.x; that.sprite.position.y = that.initValues.pos.y;};
 
     addDanceTween(game, this, {target: that.sprite,
                                targetVal: {x: '+30'},

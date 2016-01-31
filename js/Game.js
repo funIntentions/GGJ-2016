@@ -74,7 +74,7 @@ BasicGame.Game.prototype = {
         innerFire.anchor.setTo(0.5, 0.45);
         innerFire.animations.add('burn');
         innerFire.animations.play('burn', 9, true);
-        
+
         var melvarTheTerrible = new Character(this.add.sprite(0, 0, 'melvarTheTerrible'), this);
         var alfonso = new Character(this.add.sprite(0, 0, 'alfonso'), this);
         var hubert = new Character(this.add.sprite(0, 0, 'hubert'), this);
@@ -114,11 +114,44 @@ BasicGame.Game.prototype = {
         this.input.keyboard.addKey(Phaser.KeyCode.C).onDown.add(this.bopDance, this);
         this.input.keyboard.addKey(Phaser.KeyCode.V).onDown.add(this.twirlDance, this);
 
+        this.initSpotChoices();
         this.time.events.add(Phaser.Timer.SECOND * this.spawnMin, this.spawnFireRune, this);
     },
 
+    shuffle: function(array) {
+      var currentIndex = array.length, temporaryValue, randomIndex;
+
+      // While there remain elements to shuffle...
+      while (0 !== currentIndex) {
+
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+      }
+
+      return array;
+    },
+
+    initSpotChoices: function() {
+        this.spotChoices = [];
+        var index;
+        for (index = 0; index < this.spots.length; index++) {
+            this.spotChoices.push(index);
+        }
+    },
+
     spawnFireRune: function() {
-        var fireSpot = this.rnd.integerInRange(0, this.spots.length - 1);
+        if (this.spotChoices.length == 0) {
+            return false;
+        }
+
+        this.shuffle(this.spotChoices);
+        var fireSpot = this.spotChoices.pop();
         var danceType = this.rnd.integerInRange(0, dances.DANCE_COUNT - 1);
         var runeSprite = null;
         switch(danceType) {
@@ -138,12 +171,15 @@ BasicGame.Game.prototype = {
                 var runeSprite = this.add.sprite(this.world.centerX, this.world.centerY, 'hubert');
                 console.log("Unknown dance type...")
         }
+
         runeSprite.anchor.setTo(0.5, 0.5);
-        var rune = new FireRune(runeSprite, new PIXI.Point(this.spots[fireSpot].position.x, this.spots[fireSpot].position.y - this.runeYOffset), this.runeLifeTime, danceType);
+        var rune = new FireRune(runeSprite, fireSpot, new PIXI.Point(this.spots[fireSpot].position.x, this.spots[fireSpot].position.y - this.runeYOffset), this.runeLifeTime, danceType);
         this.runes.push(rune);
         this.add.tween(runeSprite).to({x: rune.targetPosition.x, y: rune.targetPosition.y}, 5000, 'Linear', true);
         var secondsUntilNextRune = this.rnd.integerInRange(this.spawnMin, this.spawnMax);
         this.time.events.add(Phaser.Timer.SECOND * secondsUntilNextRune, this.spawnFireRune, this);
+
+        return true;
     },
 
     /**
@@ -156,6 +192,8 @@ BasicGame.Game.prototype = {
         for (index = 0; index < this.runes.length; index++) {
             var rune = this.runes[index];
             switch (rune.state) {
+                case runeStates.ACTIVATED:
+                    break;
                 case runeStates.MOVING:
                     if (rune.sprite.position.distance(rune.targetPosition) < 0.1) {
                         rune.state = runeStates.ARRIVED;
@@ -203,6 +241,28 @@ BasicGame.Game.prototype = {
         this.selectionIndicator.position.setTo(newSelPos.x, newSelPos.y);
     },
 
+    verifyDanceChoice: function(newDance) {
+        var index;
+        for (index = 0; index < this.runes.length; index++) {
+            var rune = this.runes[index];
+            console.log(rune);
+            console.log(this.selectedSpot);
+            console.log(newDance);
+            if (rune.targetSpotIndex == this.selectedSpot && rune.danceType == newDance) {
+                rune.state = runeStates.ACTIVATED;
+                return true;
+            }
+        }
+
+        for (index = 0; index < this.runes.length; index++) {
+            this.runes[index].state = runeStates.DYING;
+        }
+
+        this.initSpotChoices();
+
+        return false;
+    },
+
     /**
      * Changes the dance state for the currently selected character to the given dance.
      *
@@ -211,6 +271,9 @@ BasicGame.Game.prototype = {
     changeDanceForSelected: function(newDance) {
         var character = this.spots[this.selectedSpot].character;
         var pastDance = character.danceState;
+
+        console.log (this.verifyDanceChoice(newDance));
+
         // Stop the tween and call the stop callback to reset the position (which apparently doesn't work so hot)
         character.tweens[pastDance].tween.pause();
         character.tweens[pastDance].stop();
@@ -220,7 +283,7 @@ BasicGame.Game.prototype = {
         } else {
             character.tweens[newDance].tween.start();
         }
-        
+
     },
 
     chillaxDance: function() {
