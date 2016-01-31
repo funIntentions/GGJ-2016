@@ -14,21 +14,21 @@ BasicGame.Preloader.prototype = {
 
 		//	These are the assets we loaded in Boot.js
 		//	A nice sparkly background and a loading progress bar
-		this.background = this.add.sprite(0, 0, 'preloaderBackground');
-		this.preloadBar = this.add.sprite(300, 400, 'preloaderBar');
+		//this.background = this.add.sprite(0, 0, 'preloaderBackground');
+		//this.preloadBar = this.add.sprite(300, 400, 'preloaderBar');
 
 		//	This sets the preloadBar sprite as a loader sprite.
 		//	What that does is automatically crop the sprite from 0 to full-width
 		//	as the files below are loaded in.
-		this.load.setPreloadSprite(this.preloadBar);
+		//this.load.setPreloadSprite(this.preloadBar);
 
 		//	Here we load the rest of the assets our game needs.
 		//	As this is just a Project Template I've not provided these assets, swap them for your own.
 		this.load.image('hubert', 'assets/img/Hubert.png');
         this.load.image('gourdis', 'assets/img/Gourdis.png');
         this.load.image('alfonso', 'assets/img/Alfonso.png');
-        this.load.image('melvarTheTerrible', 'assets/img/Melvar_the_Terrible.png');
         this.load.image('clamdirk', 'assets/img/Clamdirk.png');
+        this.load.image('melvarTheTerrible', 'assets/img/Melvar_the_Terrible.png');
 
         this.load.image('demonAle', 'assets/img/DemonAle.png');
         this.load.image('firePit', 'assets/img/Firepit.png');
