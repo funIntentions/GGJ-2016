@@ -43,6 +43,7 @@ BasicGame.Game.prototype = {
 
     create: function () {
         this.spots = [];
+        this.runes = [];
         this.selectedSpot = 0;
 
         var distToFire = 100;
@@ -67,6 +68,41 @@ BasicGame.Game.prototype = {
         this.input.keyboard.addKey(Phaser.KeyCode.X).onDown.add(this.wiggleDance, this);
         this.input.keyboard.addKey(Phaser.KeyCode.C).onDown.add(this.bopDance, this);
         this.input.keyboard.addKey(Phaser.KeyCode.V).onDown.add(this.twirlDance, this);
+
+        this.time.events.add(Phaser.Timer.SECOND * 4, this.spawnFireRune, this);
+    },
+
+    spawnFireRune: function() {
+        var fireSpot = this.rnd.integerInRange(0, this.spots.length - 1);
+        var danceType = this.rnd.integerInRange(0, dances.DANCE_COUNT - 1);
+        var runeSprite = this.add.sprite(this.world.centerX, this.world.centerY, 'hubert');
+        runeSprite.anchor.setTo(0.5, 0.5);
+        runeSprite.scale.setTo(0.25);
+        var rune = new FireRune(runeSprite, fireSpot, 4, danceType);
+        this.runes.push(rune);
+        this.add.tween(runeSprite).to({x: this.spots[fireSpot].position.x, y: this.spots[fireSpot].position.y}, 5000, 'Linear', true);
+        console.log(rune);
+        var secondsUntilNextRune = this.rnd.integerInRange(0, 3);
+        this.time.events.add(Phaser.Timer.SECOND * secondsUntilNextRune, this.spawnFireRune, this);
+    },
+
+    updateRunes: function() {
+        var index;
+        var runesToDestroy = [];
+
+        for (index = 0; index < this.runes.length; index++) {
+            var rune = this.runes[index];
+            rune.lifeTime -= this.time.physicsElapsed;
+            if (rune.lifeTime < 0) {
+                runesToDestroy.push(rune);
+            }
+        }
+
+        for (index = 0; index < runesToDestroy.length; index++) {
+            var indexOf = this.runes.indexOf(runesToDestroy[index]);
+            var removedRune = this.runes.splice(indexOf, 1)[0];
+            removedRune.sprite.kill();
+        }
     },
 
     incrementSelectedSpot: function() {
@@ -96,6 +132,7 @@ BasicGame.Game.prototype = {
     },
 
     update: function () {
+        this.updateRunes();
     },
 
     quitGame: function (pointer) {
