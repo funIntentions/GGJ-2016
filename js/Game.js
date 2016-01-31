@@ -48,12 +48,14 @@ BasicGame.Game.prototype = {
         this.runeLifeTime = 6;
         this.runeYOffset = 130;
 
-        var distToFire = 240;
+        var distToFire = 220;
+        var spotYOffset = 220;
 
         this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX, this.world.centerY + distToFire), false, null));
-        this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX, this.world.centerY - distToFire), false, null));
-        this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX - distToFire, this.world.centerY), false, null));
-        this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX + distToFire, this.world.centerY), false, null));
+        this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX - distToFire, this.world.centerY - spotYOffset/2), false, null));
+        this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX - distToFire, this.world.centerY + spotYOffset/2), false, null));
+        this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX + distToFire, this.world.centerY - spotYOffset/2), false, null));
+        this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX + distToFire, this.world.centerY + spotYOffset/2), false, null));
 
         var background = this.add.sprite(0, 0, 'background');
         var firePit = this.add.sprite(this.world.centerX, this.world.centerY, 'firePit');
@@ -79,29 +81,33 @@ BasicGame.Game.prototype = {
         var alfonso = new Character(this.add.sprite(0, 0, 'alfonso'), this);
         var hubert = new Character(this.add.sprite(0, 0, 'hubert'), this);
         var gourdis = new Character(this.add.sprite(0, 0, 'gourdis'), this);
+        var clamdirk = new Character(this.add.sprite(0, 0, 'clamdirk'), this);
 
         this.placeInSpot(melvarTheTerrible);
         this.placeInSpot(gourdis);
         this.placeInSpot(alfonso);
         this.placeInSpot(hubert);
+        this.placeInSpot(clamdirk);
 
         // Lol hacky af
         hubert.addPositionDependentTweens(this);
         alfonso.addPositionDependentTweens(this);
         gourdis.addPositionDependentTweens(this);
         melvarTheTerrible.addPositionDependentTweens(this);
+        clamdirk.addPositionDependentTweens(this);
 
         hubert.tweens[hubert.danceState].tween.start();
         gourdis.tweens[gourdis.danceState].tween.start();
         alfonso.tweens[alfonso.danceState].tween.start();
         melvarTheTerrible.tweens[melvarTheTerrible.danceState].tween.start();
+        clamdirk.tweens[clamdirk.danceState].tween.start();
 
         this.indicatorOffsets = [{x: this.spots[0].character.sprite.x + this.spots[0].character.sprite.width / 3, y: this.spots[0].character.sprite.y},
                                  {x: this.spots[1].character.sprite.x + this.spots[1].character.sprite.width / 3, y: this.spots[1].character.sprite.y},
                                  {x: this.spots[2].character.sprite.x + this.spots[2].character.sprite.width / 3, y: this.spots[2].character.sprite.y},
-                                 {x: this.spots[3].character.sprite.x + this.spots[3].character.sprite.width / 3, y: this.spots[3].character.sprite.y},];
-                                 //{x: this.spots[4].character.sprite.x + this.spots[4].character.sprite.x / 2, y: this.spots[4].character.sprite.y}];
-        
+                                 {x: this.spots[3].character.sprite.x + this.spots[3].character.sprite.width / 3, y: this.spots[3].character.sprite.y},
+                                 {x: this.spots[4].character.sprite.x + this.spots[4].character.sprite.width / 3, y: this.spots[4].character.sprite.y}];
+
         var currentOffset = this.indicatorOffsets[this.selectedSpot];
         this.selectionIndicator = this.add.sprite(currentOffset.x, currentOffset.y, 'demonAle');
         this.selectionIndicator.anchor.setTo(0.5, 0.5);
