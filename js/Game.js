@@ -195,10 +195,10 @@ BasicGame.Game.prototype = {
     },
 
     spawnFireRune: function() {
-        if(this.currentState == GameState.WISDOM) return;
-
         var secondsUntilNextRune = this.rnd.integerInRange(this.spawnMin, this.spawnMax);
         this.time.events.add(Phaser.Timer.SECOND * secondsUntilNextRune, this.spawnFireRune, this);
+
+        if(this.currentState == GameState.WISDOM) return;
 
         if (this.spotChoices.length == 0) {
             return false;
@@ -395,27 +395,31 @@ BasicGame.Game.prototype = {
 
         // Summon Yssug when we mess up
         if(this.messedUp) {
-            for(i = 0; i < this.runes.length; i++) this.runes[i].state = runeStates.DEAD;
             this.impartWisdom(false);
         }
 
-        // We couldn't have succeeded if we don't have a rune at each spot
-        if(this.runes.length != this.spots.length) return;
-
-        var i;
-        for(i = 0; i < this.runes.length; i++) if(this.runes[i].state != runeStates.ACTIVATED) break;
-        if(i == this.runes.length) {
-            for(i = 0; i < this.runes.length; i++) this.runes[i].state = runeStates.DEAD;
+        if(this.allRunesActivated()) {
             // Do some effect to make runes disappear
             this.impartWisdom(true);
         }
 
     },
 
+    allRunesActivated: function() {
+
+        // We couldn't have succeeded if we don't have a rune at each spot
+        if(this.runes.length != this.spots.length) return false;
+
+        for(i = 0; i < this.runes.length; i++) {
+            if(this.runes[i].state != runeStates.ACTIVATED) return false;
+        }
+        return true;
+    },
+
     updateWisdomDelivery: function() {
         if(!this.wisdomImparted) {
             if(this.smoke.animations.currentAnim.frame == 4) {
-                this.summoned.visible = true; 
+                this.summoned.visible = true;
             } else if(this.smoke.animations.currentAnim.isFinished) {
                 //this.wisdomImparted = true;
                 this.smoke.visible = false;
@@ -448,10 +452,12 @@ BasicGame.Game.prototype = {
                 this.currentState = GameState.RUNNING;
             }
         }
-        
+
     },
 
     impartWisdom: function(succeeded) {
+        // kill all the runes
+        for(i = 0; i < this.runes.length; i++) this.runes[i].state = runeStates.DEAD;
         this.currentState = GameState.WISDOM;
         this.summonAudio.play();
         if(succeeded) {
