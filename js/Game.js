@@ -386,16 +386,18 @@ BasicGame.Game.prototype = {
     },
 
     update: function () {
-        this.updateRunes();
 
         if(this.currentState == GameState.WISDOM) {
             this.updateWisdomDelivery();
             return;
         }
 
+        this.updateRunes();
+
         // Summon Yssug when we mess up
         if(this.messedUp) {
             this.impartWisdom(false);
+            this.messedUp = false;
         }
 
         if(this.allRunesActivated()) {
@@ -421,7 +423,7 @@ BasicGame.Game.prototype = {
             if(this.smoke.animations.currentAnim.frame == 4) {
                 this.summoned.visible = true;
             } else if(this.smoke.animations.currentAnim.isFinished) {
-                //this.wisdomImparted = true;
+                this.wisdomImparted = true;
                 this.smoke.visible = false;
                 var textTween = this.add.tween(this.summonedText);
                 textTween.to({alpha: 1}, 500, Phaser.Easing.Linear.None);
