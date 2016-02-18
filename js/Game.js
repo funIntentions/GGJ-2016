@@ -385,16 +385,18 @@ BasicGame.Game.prototype = {
     },
 
     update: function () {
-        this.updateRunes();
 
         if(this.currentState == GameState.WISDOM) {
             this.updateWisdomDelivery();
             return;
         }
 
+        this.updateRunes();
+
         // Summon Yssug when we mess up
         if(this.messedUp) {
             this.impartWisdom(false);
+            this.messedUp = false;
         }
 
         if(this.allRunesActivated()) {
