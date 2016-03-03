@@ -53,6 +53,7 @@ BasicGame.Game.prototype = {
         this.selectedSpot = 0;
         this.spawnMin = 4;
         this.spawnMax = 5;
+        this.wisdomDeliveryTime = 10;
         this.runeLifeTime = 6;
         this.runeYOffset = 130;
         this.requiredWisdom = 5;
@@ -192,6 +193,10 @@ BasicGame.Game.prototype = {
       }
 
       return array;
+    },
+
+    wisdomDelivered: function() {
+        this.wisdomImparted = true;
     },
 
     spawnFireRune: function() {
@@ -423,7 +428,6 @@ BasicGame.Game.prototype = {
             if(this.smoke.animations.currentAnim.frame == 4) {
                 this.summoned.visible = true;
             } else if(this.smoke.animations.currentAnim.isFinished) {
-                this.wisdomImparted = true;
                 this.smoke.visible = false;
                 var textTween = this.add.tween(this.summonedText);
                 textTween.to({alpha: 1}, 500, Phaser.Easing.Linear.None);
@@ -443,6 +447,7 @@ BasicGame.Game.prototype = {
                 }, this);
 
                 textTween.chain(textTweenEnd);*/
+                this.time.events.add(Phaser.Timer.SECOND * this.wisdomDeliveryTime, this.wisdomDelivered, this);
                 textTween.start();
             }
         } else {
