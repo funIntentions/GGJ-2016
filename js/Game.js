@@ -207,7 +207,6 @@ BasicGame.Game.prototype = {
 
         if (this.spotChoices.length == 0) {
             return false;
-            console.log("no spots");
         }
 
         this.shuffle(this.spotChoices);
@@ -424,6 +423,7 @@ BasicGame.Game.prototype = {
     },
 
     updateWisdomDelivery: function() {
+
         if(!this.wisdomImparted) {
             if(this.smoke.animations.currentAnim.frame == 4) {
                 this.summoned.visible = true;
@@ -431,8 +431,8 @@ BasicGame.Game.prototype = {
                 this.smoke.visible = false;
                 var textTween = this.add.tween(this.summonedText);
                 textTween.to({alpha: 1}, 500, Phaser.Easing.Linear.None);
-                /*
-                var textTweenEnd = this.add.tween(this.summonedText);
+
+                /*var textTweenEnd = this.add.tween(this.summonedText);
                 textTweenEnd.to({alpha: 0}, 500, Phaser.Easing.Linear.None, true, 5000);
                 textTweenEnd.onComplete.addOnce(function() {
                     if(this.summoned == this.gussy) {
@@ -447,7 +447,9 @@ BasicGame.Game.prototype = {
                 }, this);
 
                 textTween.chain(textTweenEnd);*/
+
                 this.time.events.add(Phaser.Timer.SECOND * this.wisdomDeliveryTime, this.wisdomDelivered, this);
+
                 textTween.start();
             }
         } else {
