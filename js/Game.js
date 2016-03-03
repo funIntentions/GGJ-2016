@@ -53,7 +53,7 @@ BasicGame.Game.prototype = {
         this.selectedSpot = 0;
         this.spawnMin = 4;
         this.spawnMax = 5;
-        this.wisdomDeliveryTime = 10;
+        this.wisdomDisplayTime = 10;
         this.runeLifeTime = 6;
         this.runeYOffset = 130;
         this.requiredWisdom = 5;
@@ -196,6 +196,20 @@ BasicGame.Game.prototype = {
     },
 
     wisdomDelivered: function() {
+        var textTweenEnd = this.add.tween(this.summonedText);
+        textTweenEnd.to({alpha: 0}, 500, Phaser.Easing.Linear.None, true);
+        textTweenEnd.onComplete.addOnce(function() {
+            if(this.summoned == this.gussy) {
+                this.currentWisdom++;
+                if(this.currentWisdom == this.requiredWisdom) {
+                    // Activate the surprise ending
+                    console.log("You win!");
+                }
+            }
+            this.smoke.visible = true;
+            this.smoke.animations.play('coalesce', 11, false);
+        }, this);
+        textTweenEnd.start();
         this.wisdomImparted = true;
     },
 
@@ -425,6 +439,7 @@ BasicGame.Game.prototype = {
     updateWisdomDelivery: function() {
 
         if(!this.wisdomImparted) {
+            // Super-hacky way of making Gussy/Yssug appear while the smoke is covering them
             if(this.smoke.animations.currentAnim.frame == 4) {
                 this.summoned.visible = true;
             } else if(this.smoke.animations.currentAnim.isFinished) {
@@ -432,7 +447,18 @@ BasicGame.Game.prototype = {
                 var textTween = this.add.tween(this.summonedText);
                 textTween.to({alpha: 1}, 500, Phaser.Easing.Linear.None);
 
+                this.wisdomImparted = true;
+                this.smoke.visible = false;
+
                 /*var textTweenEnd = this.add.tween(this.summonedText);
+                // Once the smoke clears, slowly reveal the text
+                this.wisdomImparted = true;
+                this.smoke.visible = false;
+                var textTween = this.add.tween(this.summonedText);
+                textTween.to({alpha: 1}, 500, Phaser.Easing.Linear.None);
+                
+                // Fade the text back out and add to the current wisdom if gussy was summoned
+                var textTweenEnd = this.add.tween(this.summonedText);
                 textTweenEnd.to({alpha: 0}, 500, Phaser.Easing.Linear.None, true, 5000);
                 textTweenEnd.onComplete.addOnce(function() {
                     if(this.summoned == this.gussy) {
@@ -448,11 +474,15 @@ BasicGame.Game.prototype = {
 
                 textTween.chain(textTweenEnd);*/
 
-                this.time.events.add(Phaser.Timer.SECOND * this.wisdomDeliveryTime, this.wisdomDelivered, this);
-
+                // Display the wisdom for the given amount of time
+                this.time.events.add(Phaser.Timer.SECOND * this.wisdomDisplayTime, this.wisdomDelivered, this);
                 textTween.start();
             }
         } else {
+            // This will be set back to visible in the wisdomDelivered function
+            if(!this.smoke.visible) return
+
+            // Super-hacky way to make Gussy/Yssug disappear after wisdom has been imparted
             if(this.smoke.animations.currentAnim.frame == 4) {
                 this.summoned.visible = false;
             } else if(this.smoke.animations.currentAnim.isFinished) {
@@ -469,11 +499,15 @@ BasicGame.Game.prototype = {
         for(i = 0; i < this.runes.length; i++) this.runes[i].state = runeStates.DEAD;
         this.currentState = GameState.WISDOM;
         this.summonAudio.play();
+
+        // Determine whom to summon
         if(succeeded) {
             this.summoned = this.gussy;
             this.summonedText.setText(this.wisdom[this.rnd.integerInRange(0, this.wisdom.length)]);
         } else {
             this.summoned = this.yssug;
+
+            // Get a random bit of "wisdom" and output a garbled version
             var text = this.wisdom[this.rnd.integerInRange(0, this.wisdom.length - 1)];
             text = text.split(" ");
             text = this.shuffle(text);
