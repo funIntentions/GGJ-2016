@@ -62,8 +62,11 @@ BasicGame.Game.prototype = {
         this.previousState = GameState.RUNNING;
         this.wisdomImparted = false;
 
-        this.wisdom = ["At night some stars come out, but some are too shy and stay in instead.", "We all keep killing time... It's no wonder time kills us all in the end.",
+        this.wisdom = ["At night some stars come out, but some are too shy and stay in instead.",
+                        "We all keep killing time... It's no wonder time kills us all in the end.",
                         "We live in the present, but the past lives in us."];
+
+        this.wisdom = this.shuffle(this.wisdom);
 
         var distToFire = 220;
         var spotYOffset = 220;
@@ -544,12 +547,15 @@ BasicGame.Game.prototype = {
         // Determine whom to summon
         if(succeeded) {
             this.summoned = this.gussy;
-            this.summonedText.setText(this.wisdom[this.rnd.integerInRange(0, this.wisdom.length)]);
+            if (this.wisdom.length > 0)
+                this.summonedText.setText(this.wisdom.pop());
+            else
+                this.summonedText.setText("[Wisdom Empty]");
         } else {
             this.summoned = this.yssug;
 
             // Get a random bit of "wisdom" and output a garbled version
-            var text = this.wisdom[this.rnd.integerInRange(0, this.wisdom.length - 1)];
+            var text = this.wisdom.length > 0 ? this.wisdom[this.rnd.integerInRange(0, this.wisdom.length - 1)] : "[Wisdom Empty]";
             text = text.split(" ");
             text = this.shuffle(text);
             var recombined = "";
