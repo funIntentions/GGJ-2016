@@ -30,6 +30,8 @@ BasicGame.Preloader.prototype = {
         this.load.image('clamdirk', 'assets/img/Clamdirk.png');
         this.load.image('melvarTheTerrible', 'assets/img/Melvar_the_Terrible.png');
 
+        this.load.image('tome', 'assets/img/Tome.png');
+
         this.load.image('demonAle', 'assets/img/DemonAle.png');
         this.load.image('firePit', 'assets/img/Firepit.png');
 

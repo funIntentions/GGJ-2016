@@ -113,7 +113,7 @@ BasicGame.Game.prototype = {
         var gourdis = new Character(this.add.sprite(0, 0, 'gourdis'), this);
         var clamdirk = new Character(this.add.sprite(0, 0, 'clamdirk'), this);
 
-        this.tome = this.add.sprite(0, 0, 'clamdirk');
+        this.tome = this.add.sprite(0, 0, 'tome');
         this.tomeDisplayPosition = {x: this.world.centerX - this.tome.width/2, y: this.world.centerY};
         this.tomeHiddenPosition = {x: this.world.centerX - this.tome.width/2, y: this.world.centerY + this.world.height};
         this.tome.x = this.tomeHiddenPosition.x;
