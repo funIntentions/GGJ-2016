@@ -142,6 +142,8 @@ BasicGame.Game.prototype = {
         this.selectionIndicator = this.add.sprite(currentOffset.x, currentOffset.y, 'demonAle');
         this.selectionIndicator.anchor.setTo(0.5, 0.5);
 
+        this.input.keyboard.addKey(Phaser.KeyCode.SAPCE).onDown.add(this.
+
         this.input.keyboard.addKey(Phaser.KeyCode.RIGHT).onDown.add(this.incrementSelectedSpot, this);
         this.input.keyboard.addKey(Phaser.KeyCode.LEFT).onDown.add(this.decrementSelectedSpot, this);
 
@@ -250,6 +252,12 @@ BasicGame.Game.prototype = {
         this.runes.push(rune);
         this.add.tween(runeSprite).to({x: rune.targetPosition.x, y: rune.targetPosition.y}, 1000, 'Linear', true);
         return true;
+    },
+
+    consultTome: function() {
+        this.currentState = GameState.MENU;
+        // Start bring up book tween
+        // DO LOTS OF COOL STUFF
     },
 
     /**
@@ -404,6 +412,10 @@ BasicGame.Game.prototype = {
     },
 
     update: function () {
+
+        if(this.currentState == GameState.MENU) {
+            
+        }
 
         if(this.currentState == GameState.WISDOM) {
             this.updateWisdomDelivery();
