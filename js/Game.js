@@ -225,7 +225,7 @@ BasicGame.Game.prototype = {
         var secondsUntilNextRune = this.rnd.integerInRange(this.spawnMin, this.spawnMax);
         this.time.events.add(Phaser.Timer.SECOND * secondsUntilNextRune, this.spawnFireRune, this);
 
-        if(this.currentState == GameState.WISDOM) return;
+        if(this.currentState != GameState.RUNNING) return;
 
         if (this.spotChoices.length == 0) {
             return false;
@@ -535,7 +535,7 @@ BasicGame.Game.prototype = {
     impartWisdom: function(succeeded) {
         // kill all the runes
         for(i = 0; i < this.runes.length; i++) this.runes[i].state = runeStates.DEAD;
-        changeState(GameState.WISDOM);
+        this.changeState(GameState.WISDOM);
         //this.currentState = GameState.WISDOM;
         this.summonAudio.play();
 
