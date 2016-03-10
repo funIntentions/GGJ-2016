@@ -62,8 +62,11 @@ BasicGame.Game.prototype = {
         this.previousState = GameState.RUNNING;
         this.wisdomImparted = false;
 
-        this.wisdom = ["At night some stars come out, but some are too shy and stay in instead.", "We all keep killing time... It's no wonder time kills us all in the end.",
+        this.wisdom = ["At night some stars come out, but some are too shy and stay in instead.",
+                        "We all keep killing time... It's no wonder time kills us all in the end.",
                         "We live in the present, but the past lives in us."];
+
+        this.wisdom = this.shuffle(this.wisdom);
 
         var distToFire = 220;
         var spotYOffset = 220;
@@ -225,7 +228,7 @@ BasicGame.Game.prototype = {
         var secondsUntilNextRune = this.rnd.integerInRange(this.spawnMin, this.spawnMax);
         this.time.events.add(Phaser.Timer.SECOND * secondsUntilNextRune, this.spawnFireRune, this);
 
-        if(this.currentState == GameState.WISDOM) return;
+        if(this.currentState != GameState.RUNNING) return;
 
         if (this.spotChoices.length == 0) {
             return false;
@@ -270,19 +273,21 @@ BasicGame.Game.prototype = {
     },
 
     consultTome: function() {
-        if (this.currentState != GameState.MENU)
+        if (this.currentState == GameState.RUNNING || this.currentState == GameState.MENU)
         {
-            this.changeState(GameState.MENU);
-            this.add.tween(this.tome).to({x: this.tomeDisplayPosition.x, y: this.tomeDisplayPosition.y}, 1000, 'Linear', true);
+            if (this.currentState != GameState.MENU)
+            {
+                // Display book
+                this.changeState(GameState.MENU);
+                this.add.tween(this.tome).to({x: this.tomeDisplayPosition.x, y: this.tomeDisplayPosition.y}, 1000, 'Linear', true);
+            }
+            else
+            {
+                // Display hide book
+                this.revertState();
+                this.add.tween(this.tome).to({x: this.tomeHiddenPosition.x, y: this.tomeHiddenPosition.y}, 1000, 'Linear', true);
+            }
         }
-        else
-        {
-            this.revertState();
-            this.add.tween(this.tome).to({x: this.tomeHiddenPosition.x, y: this.tomeHiddenPosition.y}, 1000, 'Linear', true);
-        }
-        // Start bring up book tween
-        // DO LOTS OF COOL STUFF
-        console.log("lakdsjfalkjs");
     },
 
     /**
@@ -535,19 +540,22 @@ BasicGame.Game.prototype = {
     impartWisdom: function(succeeded) {
         // kill all the runes
         for(i = 0; i < this.runes.length; i++) this.runes[i].state = runeStates.DEAD;
-        changeState(GameState.WISDOM);
+        this.changeState(GameState.WISDOM);
         //this.currentState = GameState.WISDOM;
         this.summonAudio.play();
 
         // Determine whom to summon
         if(succeeded) {
             this.summoned = this.gussy;
-            this.summonedText.setText(this.wisdom[this.rnd.integerInRange(0, this.wisdom.length)]);
+            if (this.wisdom.length > 0)
+                this.summonedText.setText(this.wisdom.pop());
+            else
+                this.summonedText.setText("[Wisdom Empty]");
         } else {
             this.summoned = this.yssug;
 
             // Get a random bit of "wisdom" and output a garbled version
-            var text = this.wisdom[this.rnd.integerInRange(0, this.wisdom.length - 1)];
+            var text = this.wisdom.length > 0 ? this.wisdom[this.rnd.integerInRange(0, this.wisdom.length - 1)] : "[Wisdom Empty]";
             text = text.split(" ");
             text = this.shuffle(text);
             var recombined = "";
