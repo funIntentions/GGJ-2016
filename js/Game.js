@@ -270,19 +270,21 @@ BasicGame.Game.prototype = {
     },
 
     consultTome: function() {
-        if (this.currentState != GameState.MENU)
+        if (this.currentState == GameState.RUNNING || this.currentState == GameState.MENU)
         {
-            this.changeState(GameState.MENU);
-            this.add.tween(this.tome).to({x: this.tomeDisplayPosition.x, y: this.tomeDisplayPosition.y}, 1000, 'Linear', true);
+            if (this.currentState != GameState.MENU)
+            {
+                // Display book
+                this.changeState(GameState.MENU);
+                this.add.tween(this.tome).to({x: this.tomeDisplayPosition.x, y: this.tomeDisplayPosition.y}, 1000, 'Linear', true);
+            }
+            else
+            {
+                // Display hide book
+                this.revertState();
+                this.add.tween(this.tome).to({x: this.tomeHiddenPosition.x, y: this.tomeHiddenPosition.y}, 1000, 'Linear', true);
+            }
         }
-        else
-        {
-            this.revertState();
-            this.add.tween(this.tome).to({x: this.tomeHiddenPosition.x, y: this.tomeHiddenPosition.y}, 1000, 'Linear', true);
-        }
-        // Start bring up book tween
-        // DO LOTS OF COOL STUFF
-        console.log("lakdsjfalkjs");
     },
 
     /**
