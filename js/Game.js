@@ -1,8 +1,7 @@
 var GameState = {
     MENU: 0,
-    TUTORIAL: 1,
-    RUNNING: 2,
-    WISDOM: 3
+    RUNNING: 1,
+    WISDOM: 2
 };
 
 BasicGame.Game = function (game) {
@@ -60,6 +59,7 @@ BasicGame.Game.prototype = {
         this.currentWisdom = 0;
         this.messedUp = false;
         this.currentState = GameState.RUNNING;
+        this.previousState = GameState.RUNNING;
         this.wisdomImparted = false;
 
         this.wisdom = ["At night some stars come out, but some are too shy and stay in instead.", "We all keep killing time... It's no wonder time kills us all in the end.",
@@ -113,6 +113,12 @@ BasicGame.Game.prototype = {
         var gourdis = new Character(this.add.sprite(0, 0, 'gourdis'), this);
         var clamdirk = new Character(this.add.sprite(0, 0, 'clamdirk'), this);
 
+        this.tome = this.add.sprite(0, 0, 'clamdirk');
+        this.tomeDisplayPosition = {x: this.world.centerX - this.tome.width/2, y: this.world.centerY};
+        this.tomeHiddenPosition = {x: this.world.centerX - this.tome.width/2, y: this.world.centerY + this.world.height};
+        this.tome.x = this.tomeHiddenPosition.x;
+        this.tome.y = this.tomeHiddenPosition.y;
+
         this.placeInSpot(melvarTheTerrible);
         this.placeInSpot(gourdis);
         this.placeInSpot(alfonso);
@@ -142,7 +148,7 @@ BasicGame.Game.prototype = {
         this.selectionIndicator = this.add.sprite(currentOffset.x, currentOffset.y, 'demonAle');
         this.selectionIndicator.anchor.setTo(0.5, 0.5);
 
-        this.input.keyboard.addKey(Phaser.KeyCode.SAPCE).onDown.add(this.
+        this.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR).onDown.add(this.consultTome, this);
 
         this.input.keyboard.addKey(Phaser.KeyCode.RIGHT).onDown.add(this.incrementSelectedSpot, this);
         this.input.keyboard.addKey(Phaser.KeyCode.LEFT).onDown.add(this.decrementSelectedSpot, this);
@@ -254,10 +260,29 @@ BasicGame.Game.prototype = {
         return true;
     },
 
+    changeState: function(newState) {
+        this.previousState = this.currentState;
+        this.currentState = newState;
+    },
+
+    revertState: function() {
+        this.currentState = this.previousState;
+    },
+
     consultTome: function() {
-        this.currentState = GameState.MENU;
+        if (this.currentState != GameState.MENU)
+        {
+            this.changeState(GameState.MENU);
+            this.add.tween(this.tome).to({x: this.tomeDisplayPosition.x, y: this.tomeDisplayPosition.y}, 1000, 'Linear', true);
+        }
+        else
+        {
+            this.revertState();
+            this.add.tween(this.tome).to({x: this.tomeHiddenPosition.x, y: this.tomeHiddenPosition.y}, 1000, 'Linear', true);
+        }
         // Start bring up book tween
         // DO LOTS OF COOL STUFF
+        console.log("lakdsjfalkjs");
     },
 
     /**
@@ -414,7 +439,7 @@ BasicGame.Game.prototype = {
     update: function () {
 
         if(this.currentState == GameState.MENU) {
-            
+
         }
 
         if(this.currentState == GameState.WISDOM) {
@@ -468,7 +493,7 @@ BasicGame.Game.prototype = {
                 this.smoke.visible = false;
                 var textTween = this.add.tween(this.summonedText);
                 textTween.to({alpha: 1}, 500, Phaser.Easing.Linear.None);
-                
+
                 // Fade the text back out and add to the current wisdom if gussy was summoned
                 var textTweenEnd = this.add.tween(this.summonedText);
                 textTweenEnd.to({alpha: 0}, 500, Phaser.Easing.Linear.None, true, 5000);
@@ -500,7 +525,8 @@ BasicGame.Game.prototype = {
             } else if(this.smoke.animations.currentAnim.isFinished) {
                 this.smoke.visible = false;
                 this.wisdomImparted = false;
-                this.currentState = GameState.RUNNING;
+                this.changeState(GameState.RUNNING);
+                //this.currentState = GameState.RUNNING;
             }
         }
 
@@ -509,7 +535,8 @@ BasicGame.Game.prototype = {
     impartWisdom: function(succeeded) {
         // kill all the runes
         for(i = 0; i < this.runes.length; i++) this.runes[i].state = runeStates.DEAD;
-        this.currentState = GameState.WISDOM;
+        changeState(GameState.WISDOM);
+        //this.currentState = GameState.WISDOM;
         this.summonAudio.play();
 
         // Determine whom to summon
