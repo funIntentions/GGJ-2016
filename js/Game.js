@@ -61,6 +61,7 @@ BasicGame.Game.prototype = {
         this.currentState = GameState.RUNNING;
         this.previousState = GameState.RUNNING;
         this.wisdomImparted = false;
+        this.group = this.add.group(); // will hold all game sprites and sort them for rendering
 
         this.wisdom = ["At night some stars come out, but some are too shy and stay in instead.",
                         "We all keep killing time... It's no wonder time kills us all in the end.",
@@ -77,46 +78,47 @@ BasicGame.Game.prototype = {
         this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX + distToFire, this.world.centerY + spotYOffset/2), false, null));
         this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX + distToFire, this.world.centerY - spotYOffset/2), false, null));
 
-        var background = this.add.sprite(0, 0, 'background');
-        var firePit = this.add.sprite(this.world.centerX, this.world.centerY, 'firePit');
+        var background = this.group.create(0, 0, 'background');
+        var firePit = this.group.create(this.world.centerX, this.world.centerY, 'firePit');
         firePit.anchor.setTo(0.5, 0.3);
 
         // Load the fire spritesheets
-        var outerFire = this.add.sprite(firePit.x, firePit.y, 'largeFire');
+        var outerFire = this.group.create(firePit.x, firePit.y, 'largeFire');
         outerFire.anchor.setTo(0.5, 0.7);
         outerFire.animations.add('burn');
         outerFire.animations.play('burn', 8, true);
 
-        var middleFire = this.add.sprite(firePit.x, firePit.y, 'medFire');
+        var middleFire = this.group.create(firePit.x, firePit.y, 'medFire');
         middleFire.anchor.setTo(0.5, 0.65);
         middleFire.animations.add('burn');
         middleFire.animations.play('burn', 8.5, true);
 
-        var innerFire = this.add.sprite(firePit.x, firePit.y, 'smallFire');
+        var innerFire = this.group.create(firePit.x, firePit.y, 'smallFire');
         innerFire.anchor.setTo(0.5, 0.45);
         innerFire.animations.add('burn');
         innerFire.animations.play('burn', 9, true);
 
-        this.smoke = this.add.sprite(firePit.x, firePit.y - outerFire.height / 2, 'smoke');
+        this.smoke = this.group.create(firePit.x, firePit.y - outerFire.height / 2, 'smoke');
         this.smoke.animations.add('coalesce');
         this.smoke.visible = false;
         this.smoke.anchor.setTo(0.5, 0.5);
 
-        this.gussy = this.add.sprite(this.smoke.x, this.smoke.y, 'gussy');
+        this.gussy = this.group.create(this.smoke.x, this.smoke.y, 'gussy');
         this.gussy.anchor.setTo(0.5, 0.5);
         this.gussy.visible = false;
 
-        this.yssug = this.add.sprite(this.smoke.x, this.smoke.y, 'yssug');
+        this.yssug = this.group.create(this.smoke.x, this.smoke.y, 'yssug');
         this.yssug.anchor.setTo(0.5, 0.5);
         this.yssug.visible = false;
 
-        var melvarTheTerrible = new Character(this.add.sprite(0, 0, 'melvarTheTerrible'), this);
-        var alfonso = new Character(this.add.sprite(0, 0, 'alfonso'), this);
-        var hubert = new Character(this.add.sprite(0, 0, 'hubert'), this);
-        var gourdis = new Character(this.add.sprite(0, 0, 'gourdis'), this);
-        var clamdirk = new Character(this.add.sprite(0, 0, 'clamdirk'), this);
+        var melvarTheTerrible = new Character(this.group.create(0, 0, 'melvarTheTerrible'), this);
+        var alfonso = new Character(this.group.create(0, 0, 'alfonso'), this);
+        var hubert = new Character(this.group.create(0, 0, 'hubert'), this);
+        var gourdis = new Character(this.group.create(0, 0, 'gourdis'), this);
+        var clamdirk = new Character(this.group.create(0, 0, 'clamdirk'), this);
 
-        this.tome = this.add.sprite(0, 0, 'tome');
+        this.tome = this.group.create(0, 0, 'tome');
+        this.tome.z = 15;
         this.tomeDisplayPosition = {x: this.world.centerX - this.tome.width/2, y: this.world.height - this.tome.height};
         this.tomeHiddenPosition = {x: this.world.centerX - this.tome.width/2, y: this.world.centerY + this.world.height};
         this.tome.x = this.tomeHiddenPosition.x;
@@ -148,7 +150,7 @@ BasicGame.Game.prototype = {
                                  {x: this.spots[4].character.sprite.x + this.spots[4].character.sprite.width / 3, y: this.spots[4].character.sprite.y}];
 
         var currentOffset = this.indicatorOffsets[this.selectedSpot];
-        this.selectionIndicator = this.add.sprite(currentOffset.x, currentOffset.y, 'demonAle');
+        this.selectionIndicator = this.group.create(currentOffset.x, currentOffset.y, 'demonAle');
         this.selectionIndicator.anchor.setTo(0.5, 0.5);
 
         this.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR).onDown.add(this.consultTome, this);
@@ -240,19 +242,19 @@ BasicGame.Game.prototype = {
         var runeSprite = null;
         switch(danceType) {
             case dances.CHILLAX:
-                var runeSprite = this.add.sprite(this.world.centerX, this.world.centerY, 'chillaxRune');
+                var runeSprite = this.group.create(this.world.centerX, this.world.centerY, 'chillaxRune');
                 break;
             case dances.WIGGLE:
-                var runeSprite = this.add.sprite(this.world.centerX, this.world.centerY, 'wiggleRune');
+                var runeSprite = this.group.create(this.world.centerX, this.world.centerY, 'wiggleRune');
                 break;
             case dances.BOP:
-                var runeSprite = this.add.sprite(this.world.centerX, this.world.centerY, 'bopRune');
+                var runeSprite = this.group.create(this.world.centerX, this.world.centerY, 'bopRune');
                 break;
             case dances.TWIRL:
-                var runeSprite = this.add.sprite(this.world.centerX, this.world.centerY, 'twirlRune');
+                var runeSprite = this.group.create(this.world.centerX, this.world.centerY, 'twirlRune');
                 break;
             default:
-                var runeSprite = this.add.sprite(this.world.centerX, this.world.centerY, 'hubert');
+                var runeSprite = this.group.create(this.world.centerX, this.world.centerY, 'hubert');
                 console.log("Unknown dance type...")
         }
 
@@ -380,19 +382,19 @@ BasicGame.Game.prototype = {
         var runeSprite = null;
         switch(danceType) {
             case dances.CHILLAX:
-                runeSprite = this.add.sprite(position.x, position.y, 'chillaxRuneSuccess');
+                runeSprite = this.group.create(position.x, position.y, 'chillaxRuneSuccess');
                 break;
             case dances.WIGGLE:
-                runeSprite = this.add.sprite(position.x, position.y, 'wiggleRuneSuccess');
+                runeSprite = this.group.create(position.x, position.y, 'wiggleRuneSuccess');
                 break;
             case dances.BOP:
-                runeSprite = this.add.sprite(position.x, position.y, 'bopRuneSuccess');
+                runeSprite = this.group.create(position.x, position.y, 'bopRuneSuccess');
                 break;
             case dances.TWIRL:
-                runeSprite = this.add.sprite(position.x, position.y, 'twirlRuneSuccess');
+                runeSprite = this.group.create(position.x, position.y, 'twirlRuneSuccess');
                 break;
             default:
-                runeSprite = this.add.sprite(position.x, position.y, 'hubert');
+                runeSprite = this.group.create(position.x, position.y, 'hubert');
                 console.log("Unknown dance type...")
         }
         runeSprite.anchor.setTo(0.5, 0.5);
@@ -442,6 +444,8 @@ BasicGame.Game.prototype = {
     },
 
     update: function () {
+
+        this.group.sort("z");
 
         if(this.currentState == GameState.MENU) {
 

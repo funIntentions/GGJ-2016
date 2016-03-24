@@ -7,6 +7,7 @@ runeStates = {
 
 function FireRune(sprite, targetSpotIndex, targetPosition, lifeTime, danceType) {
     this.sprite = sprite;
+    this.sprite.z = 14;
     this.targetSpotIndex = targetSpotIndex;
     this.targetPosition = targetPosition;
     this.lifeTime = lifeTime;
