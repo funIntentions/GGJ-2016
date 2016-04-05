@@ -559,13 +559,11 @@ BasicGame.Game.prototype = {
             this.summoned = this.yssug;
 
             // Get a random bit of "wisdom" and output a garbled version
-            var text = this.wisdom.length > 0 ? this.wisdom[this.rnd.integerInRange(0, this.wisdom.length - 1)] : "[Wisdom Empty]";
-            text = text.split(" ");
-            text = this.shuffle(text);
-            var recombined = "";
-            for(var i = 0; i < text.length - 1; i++) recombined += text[i] + " ";
-            recombined += text[text.length - 1];
-            this.summonedText.setText(text);
+            var toImpart = this.wisdom.length > 0 ? this.wisdom[this.rnd.integerInRange(0, this.wisdom.length - 1)] : "[Wisdom Empty]";
+            toImpart = toImpart.split(" ");
+            toImpart = this.shuffle(toImpart);
+            var recombined = toImpart.join(" ");
+            this.summonedText.setText(recombined.substr(0, recombined.length));
         }
         this.summonedText.visible = true;
         this.smoke.visible = true;
