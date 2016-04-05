@@ -260,7 +260,9 @@ BasicGame.Game.prototype = {
 
         runeSprite.anchor.setTo(0.5, 0.5);
         var rune = new FireRune(runeSprite, fireSpot, new PIXI.Point(this.spots[fireSpot].position.x, this.spots[fireSpot].position.y - this.runeYOffset), this.runeLifeTime, danceType);
+        rune.sprite.z = 14;
         this.runes.push(rune);
+
         this.add.tween(runeSprite).to({x: rune.targetPosition.x, y: rune.targetPosition.y}, 1000, 'Linear', true);
         return true;
     },
@@ -366,6 +368,7 @@ BasicGame.Game.prototype = {
                 var position = new PIXI.Point(rune.sprite.position.x, rune.sprite.position.y);
                 rune.sprite.kill();
                 rune.sprite = this.getActivatedRuneSprite(rune.danceType, position);
+                rune.sprite.z = 14;
 
                 return true;
             }
@@ -461,7 +464,6 @@ BasicGame.Game.prototype = {
         // Summon Yssug when we mess up
         if(this.messedUp) {
             this.impartWisdom(false);
-            this.messedUp = false;
         }
 
         if(this.allRunesActivated()) {
@@ -535,6 +537,7 @@ BasicGame.Game.prototype = {
                 this.smoke.visible = false;
                 this.wisdomImparted = false;
                 this.changeState(GameState.RUNNING);
+                this.messedUp = false;
                 //this.currentState = GameState.RUNNING;
             }
         }
