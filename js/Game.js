@@ -52,7 +52,7 @@ BasicGame.Game.prototype = {
         this.selectedSpot = 0;
         this.spawnMin = 4;
         this.spawnMax = 5;
-        this.wisdomDisplayTime = 10;
+        this.wisdomDisplayTime = 4;
         this.runeLifeTime = 6;
         this.runeDeathTime = 1;
         this.runeYOffset = 130;
@@ -429,7 +429,7 @@ BasicGame.Game.prototype = {
         var character = this.spots[this.selectedSpot].character;
         var pastDance = character.danceState;
 
-        if (!this.verifyDanceChoice(newDance)) {
+        if (character != this.gussy && !this.verifyDanceChoice(newDance)) {
             this.messedUp = true;
             this.messedUpAudio.play();
         }
