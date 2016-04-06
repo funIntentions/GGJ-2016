@@ -54,6 +54,7 @@ BasicGame.Game.prototype = {
         this.spawnMax = 5;
         this.wisdomDisplayTime = 10;
         this.runeLifeTime = 6;
+        this.runeDeathTime = 1;
         this.runeYOffset = 130;
         this.requiredWisdom = 5;
         this.currentWisdom = 0;
@@ -313,7 +314,7 @@ BasicGame.Game.prototype = {
                     break;
                 case runeStates.ARRIVED:
                     rune.lifeTime -= this.time.physicsElapsed;
-                    if (rune.lifeTime < 3) {
+                    if (rune.lifeTime < this.runeDeathTime) {
                         this.add.tween(rune.sprite).to({alpha: 0}, 1000, 'Linear', true, 0, -1, true);
                         rune.state = runeStates.DYING;
                     }
@@ -322,6 +323,8 @@ BasicGame.Game.prototype = {
                     rune.lifeTime -= this.time.physicsElapsed;
                     if (rune.lifeTime < 0) {
                         rune.state = runeStates.DEAD;
+                    } else {
+                        rune.sprite.alpha = rune.lifeTime/this.runeDeathTime;
                     }
                 break;
                 case runeStates.DEAD:
@@ -375,7 +378,8 @@ BasicGame.Game.prototype = {
         }
 
         for (index = 0; index < this.runes.length; index++) {
-            this.runes[index].state = runeStates.DEAD;
+            this.runes[index].lifeTime = this.runeDeathTime;
+            this.runes[index].state = runeStates.DYING;
         }
 
         return false;
@@ -454,12 +458,12 @@ BasicGame.Game.prototype = {
 
         }
 
+        this.updateRunes();
+
         if(this.currentState == GameState.WISDOM) {
             this.updateWisdomDelivery();
             return;
         }
-
-        this.updateRunes();
 
         // Summon Yssug when we mess up
         if(this.messedUp) {
@@ -546,7 +550,11 @@ BasicGame.Game.prototype = {
 
     impartWisdom: function(succeeded) {
         // kill all the runes
-        for(i = 0; i < this.runes.length; i++) this.runes[i].state = runeStates.DEAD;
+        for(i = 0; i < this.runes.length; i++)
+        {
+            this.runes[i].lifeTime = this.runeDeathTime;
+            this.runes[i].state = runeStates.DYING;
+        }
         this.changeState(GameState.WISDOM);
         //this.currentState = GameState.WISDOM;
         this.summonAudio.play();
