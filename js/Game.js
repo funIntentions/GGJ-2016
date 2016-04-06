@@ -67,7 +67,7 @@ BasicGame.Game.prototype = {
         this.wisdom = ["At night some stars come out, but some are too shy and stay in instead."];//,
                         //"We all keep killing time... It's no wonder time kills us all in the end.",
                         //"We live in the present, but the past lives in us."];
-
+        this.finalRequest = "Daemon ale, yo";
         this.wisdom = this.shuffle(this.wisdom);
         this.finale = false; // Gussy/Yussg's final appearance.
 
@@ -229,8 +229,10 @@ BasicGame.Game.prototype = {
                     console.log("You win!");
                 }
             }
-            this.smoke.visible = true;
-            this.smoke.animations.play('coalesce', 11, false);
+            if (!this.finale) { // A bit hacky
+                this.smoke.visible = true;
+                this.smoke.animations.play('coalesce', 11, false);
+            }
         }, this);
         textTweenEnd.start();
         this.wisdomImparted = true;
@@ -541,8 +543,8 @@ BasicGame.Game.prototype = {
                 textTween.start();
             }
         } else {
-            // This will be set back to visible in the wisdomDelivered function
-            if(!this.smoke.visible) return
+            // This will be set back to visible in the wisdomDelivered function if it's not the finale
+            if(!this.smoke.visible || this.finale) return
 
             // Super-hacky way to make Gussy/Yssug disappear after wisdom has been imparted
             if(this.smoke.animations.currentAnim.frame == 4) {
@@ -576,14 +578,14 @@ BasicGame.Game.prototype = {
                 this.summonedText.setText(this.wisdom.pop());
             else
             {
-                this.summonedText.setText("Daemon ale please.");
+                this.summonedText.setText(this.finalRequest);
                 this.finale = true;
             }
         } else {
             this.summoned = this.yssug.sprite;
 
             // Get a random bit of "wisdom" and output a garbled version
-            var toImpart = this.wisdom.length > 0 ? this.wisdom[this.rnd.integerInRange(0, this.wisdom.length - 1)] : "Daemon ale please.";
+            var toImpart = this.wisdom.length > 0 ? this.wisdom[this.rnd.integerInRange(0, this.wisdom.length - 1)] : this.finalRequest;
             toImpart = toImpart.split(" ");
             toImpart = this.shuffle(toImpart);
             var recombined = toImpart.join(" ");
