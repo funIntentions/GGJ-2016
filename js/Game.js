@@ -64,11 +64,12 @@ BasicGame.Game.prototype = {
         this.wisdomImparted = false;
         this.group = this.add.group(); // will hold all game sprites and sort them for rendering
 
-        this.wisdom = ["At night some stars come out, but some are too shy and stay in instead.",
-                        "We all keep killing time... It's no wonder time kills us all in the end.",
-                        "We live in the present, but the past lives in us."];
+        this.wisdom = ["At night some stars come out, but some are too shy and stay in instead."];//,
+                        //"We all keep killing time... It's no wonder time kills us all in the end.",
+                        //"We live in the present, but the past lives in us."];
 
         this.wisdom = this.shuffle(this.wisdom);
+        this.finale = false; // Gussy/Yussg's final appearance.
 
         var distToFire = 220;
         var spotYOffset = 220;
@@ -104,13 +105,17 @@ BasicGame.Game.prototype = {
         this.smoke.visible = false;
         this.smoke.anchor.setTo(0.5, 0.5);
 
-        this.gussy = this.group.create(this.smoke.x, this.smoke.y, 'gussy');
-        this.gussy.anchor.setTo(0.5, 0.5);
-        this.gussy.visible = false;
+        this.gussy = new Character(this.group.create(this.smoke.x, this.smoke.y, 'gussy'), this);
+        //this.gussy = this.group.create(this.smoke.x, this.smoke.y, 'gussy');
+        this.gussy.sprite.anchor.setTo(0.5, 0.5);
+        this.gussy.sprite.visible = false;
 
-        this.yssug = this.group.create(this.smoke.x, this.smoke.y, 'yssug');
-        this.yssug.anchor.setTo(0.5, 0.5);
-        this.yssug.visible = false;
+        this.yssug = new Character(this.group.create(this.smoke.x, this.smoke.y, 'yssug'), this);
+        //this.yssug = this.group.create(this.smoke.x, this.smoke.y, 'yssug');
+        this.yssug.sprite.anchor.setTo(0.5, 0.5);
+        this.yssug.sprite.visible = false;
+
+        this.spots.push(new FireSpot(new PIXI.Point(this.gussy.x, this.gussy.y), false, this.gussy));
 
         var melvarTheTerrible = new Character(this.group.create(0, 0, 'melvarTheTerrible'), this);
         var alfonso = new Character(this.group.create(0, 0, 'alfonso'), this);
@@ -137,18 +142,21 @@ BasicGame.Game.prototype = {
         gourdis.addPositionDependentTweens(this);
         melvarTheTerrible.addPositionDependentTweens(this);
         clamdirk.addPositionDependentTweens(this);
+        this.gussy.addPositionDependentTweens(this);
 
         hubert.tweens[hubert.danceState].tween.start();
         gourdis.tweens[gourdis.danceState].tween.start();
         alfonso.tweens[alfonso.danceState].tween.start();
         melvarTheTerrible.tweens[melvarTheTerrible.danceState].tween.start();
         clamdirk.tweens[clamdirk.danceState].tween.start();
+        clamdirk.tweens[this.gussy.danceState].tween.start();
 
         this.indicatorOffsets = [{x: this.spots[0].character.sprite.x + this.spots[0].character.sprite.width / 3, y: this.spots[0].character.sprite.y},
                                  {x: this.spots[1].character.sprite.x + this.spots[1].character.sprite.width / 3, y: this.spots[1].character.sprite.y},
                                  {x: this.spots[2].character.sprite.x + this.spots[2].character.sprite.width / 3, y: this.spots[2].character.sprite.y},
                                  {x: this.spots[3].character.sprite.x + this.spots[3].character.sprite.width / 3, y: this.spots[3].character.sprite.y},
-                                 {x: this.spots[4].character.sprite.x + this.spots[4].character.sprite.width / 3, y: this.spots[4].character.sprite.y}];
+                                 {x: this.spots[4].character.sprite.x + this.spots[4].character.sprite.width / 3, y: this.spots[4].character.sprite.y},
+                                 {x: this.spots[5].character.sprite.x + this.spots[5].character.sprite.width / 3, y: this.spots[5].character.sprite.y}];
 
         var currentOffset = this.indicatorOffsets[this.selectedSpot];
         this.selectionIndicator = this.group.create(currentOffset.x, currentOffset.y, 'demonAle');
@@ -164,8 +172,9 @@ BasicGame.Game.prototype = {
         this.input.keyboard.addKey(Phaser.KeyCode.C).onDown.add(this.bopDance, this);
         this.input.keyboard.addKey(Phaser.KeyCode.V).onDown.add(this.twirlDance, this);
 
+        // length - 1 because gussy is in the last spot and fire runes shouldn't be sent to gussy
         var index;
-        for (index = 0; index < this.spots.length; index++) {
+        for (index = 0; index < this.spots.length - 1; index++) {
             this.spotChoices.push(index);
         }
 
@@ -213,7 +222,7 @@ BasicGame.Game.prototype = {
         var textTweenEnd = this.add.tween(this.summonedText);
         textTweenEnd.to({alpha: 0}, 500, Phaser.Easing.Linear.None, true);
         textTweenEnd.onComplete.addOnce(function() {
-            if(this.summoned == this.gussy) {
+            if(this.summoned == this.gussy.sprite) {
                 this.currentWisdom++;
                 if(this.currentWisdom == this.requiredWisdom) {
                     // Activate the surprise ending
@@ -346,6 +355,7 @@ BasicGame.Game.prototype = {
 
     incrementSelectedSpot: function() {
         this.selectedSpot = (this.selectedSpot + 1) % this.spots.length;
+        if (this.selectedSpot == 5 && !this.finale) this.selectedSpot = 4; // hack alert: 5 is gussy
         var newSelPos = this.indicatorOffsets[this.selectedSpot];
         this.selectionIndicator.position.setTo(newSelPos.x, newSelPos.y);
     },
@@ -355,8 +365,8 @@ BasicGame.Game.prototype = {
      */
     decrementSelectedSpot: function() {
         this.selectedSpot = (this.selectedSpot - 1) % this.spots.length;
-
         if (this.selectedSpot < 0) {this.selectedSpot = this.spots.length - 1;}
+        if (this.selectedSpot == 5 && !this.finale) this.selectedSpot = 0; // hack alert: 5 is gussy
         var newSelPos = this.indicatorOffsets[this.selectedSpot];
         this.selectionIndicator.position.setTo(newSelPos.x, newSelPos.y);
     },
@@ -480,7 +490,7 @@ BasicGame.Game.prototype = {
     allRunesActivated: function() {
 
         // We couldn't have succeeded if we don't have a rune at each spot
-        if(this.runes.length != this.spots.length) return false;
+        if(this.runes.length != this.spots.length - 1) return false;
 
         for(i = 0; i < this.runes.length; i++) {
             if(this.runes[i].state != runeStates.ACTIVATED) return false;
@@ -561,16 +571,19 @@ BasicGame.Game.prototype = {
 
         // Determine whom to summon
         if(succeeded) {
-            this.summoned = this.gussy;
+            this.summoned = this.gussy.sprite;
             if (this.wisdom.length > 0)
                 this.summonedText.setText(this.wisdom.pop());
             else
-                this.summonedText.setText("[Wisdom Empty]");
+            {
+                this.summonedText.setText("Daemon ale please.");
+                this.finale = true;
+            }
         } else {
-            this.summoned = this.yssug;
+            this.summoned = this.yssug.sprite;
 
             // Get a random bit of "wisdom" and output a garbled version
-            var toImpart = this.wisdom.length > 0 ? this.wisdom[this.rnd.integerInRange(0, this.wisdom.length - 1)] : "[Wisdom Empty]";
+            var toImpart = this.wisdom.length > 0 ? this.wisdom[this.rnd.integerInRange(0, this.wisdom.length - 1)] : "Daemon ale please.";
             toImpart = toImpart.split(" ");
             toImpart = this.shuffle(toImpart);
             var recombined = toImpart.join(" ");
