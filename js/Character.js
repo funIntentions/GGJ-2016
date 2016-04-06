@@ -29,6 +29,7 @@ function addDanceTween(game, character, tweenProps, stopCallback, index) {
 function Character(sprite, game, danceState) {
     this.sprite = sprite;
     this.sprite.anchor.setTo(0.5, 0.5);
+    this.sprite.z = 10;
     this.danceState = danceState || dances.CHILLAX;
     this.initValues = {scale: {x: 1, y:  1}, rotation: sprite.rotation};
 

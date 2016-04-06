@@ -42,6 +42,8 @@ BasicGame.Preloader.prototype = {
 
         // Load the beach background
         this.load.image('background', 'assets/img/Background.png');
+        this.load.image('fireLight', 'assets/img/FireLight.png');
+        this.load.image('fireWhiteLight', 'assets/img/FireWhiteLight.png');
 
         // Load the fire runes
         this.load.image('bopRune', 'assets/img/BopRune.png');

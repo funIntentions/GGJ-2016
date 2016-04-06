@@ -64,9 +64,11 @@ BasicGame.Game.prototype = {
         this.wisdomImparted = false;
         this.group = this.add.group(); // will hold all game sprites and sort them for rendering
 
-        this.wisdom = ["At night some stars come out, but some are too shy and stay in instead."];//,
-                        //"We all keep killing time... It's no wonder time kills us all in the end.",
-                        //"We live in the present, but the past lives in us."];
+        this.wisdom = ["At night some stars come out, but some are too shy and stay in instead.",
+                       "We all keep killing time... It's no wonder time kills us all in the end.",
+                       "The happy clam is a yummy clam, but no clam is happy about being eaten.",
+                       "Love everything, you silly daemons.",
+                       "Breakfast is the most important meal of the day, but brinner is close too."];
         this.finalRequest = "Daemon ale, yo";
         this.wisdom = this.shuffle(this.wisdom);
         this.finale = false; // Gussy/Yussg's final appearance.
@@ -79,11 +81,17 @@ BasicGame.Game.prototype = {
         this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX, this.world.centerY + distToFire), false, null));
         this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX + distToFire, this.world.centerY + spotYOffset/2), false, null));
         this.spots.push(new FireSpot(new PIXI.Point(this.world.centerX + distToFire, this.world.centerY - spotYOffset/2), false, null));
-
+        
         var background = this.group.create(0, 0, 'background');
+        
+        this.fireWhiteLight = this.group.create(0, 0, 'fireWhiteLight');
+        
+        this.fireLight = this.group.create(this.world.centerX, this.world.centerY, 'fireLight');
+        this.fireLight.anchor.setTo(0.5, 0.3);
+        
         var firePit = this.group.create(this.world.centerX, this.world.centerY, 'firePit');
         firePit.anchor.setTo(0.5, 0.3);
-
+        
         // Load the fire spritesheets
         var outerFire = this.group.create(firePit.x, firePit.y, 'largeFire');
         outerFire.anchor.setTo(0.5, 0.7);
@@ -99,7 +107,8 @@ BasicGame.Game.prototype = {
         innerFire.anchor.setTo(0.5, 0.45);
         innerFire.animations.add('burn');
         innerFire.animations.play('burn', 9, true);
-
+       
+        
         this.smoke = this.group.create(firePit.x, firePit.y - outerFire.height / 2, 'smoke');
         this.smoke.animations.add('coalesce');
         this.smoke.visible = false;
@@ -149,7 +158,7 @@ BasicGame.Game.prototype = {
         alfonso.tweens[alfonso.danceState].tween.start();
         melvarTheTerrible.tweens[melvarTheTerrible.danceState].tween.start();
         clamdirk.tweens[clamdirk.danceState].tween.start();
-        clamdirk.tweens[this.gussy.danceState].tween.start();
+        this.gussy.tweens[this.gussy.danceState].tween.start();
 
         this.indicatorOffsets = [{x: this.spots[0].character.sprite.x + this.spots[0].character.sprite.width / 3, y: this.spots[0].character.sprite.y},
                                  {x: this.spots[1].character.sprite.x + this.spots[1].character.sprite.width / 3, y: this.spots[1].character.sprite.y},
@@ -161,6 +170,7 @@ BasicGame.Game.prototype = {
         var currentOffset = this.indicatorOffsets[this.selectedSpot];
         this.selectionIndicator = this.group.create(currentOffset.x, currentOffset.y, 'demonAle');
         this.selectionIndicator.anchor.setTo(0.5, 0.5);
+        this.selectionIndicator.z = 11;
 
         this.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR).onDown.add(this.consultTome, this);
 
@@ -513,30 +523,6 @@ BasicGame.Game.prototype = {
 
                 this.wisdomImparted = true;
                 this.smoke.visible = false;
-
-                /*var textTweenEnd = this.add.tween(this.summonedText);
-                // Once the smoke clears, slowly reveal the text
-                this.wisdomImparted = true;
-                this.smoke.visible = false;
-                var textTween = this.add.tween(this.summonedText);
-                textTween.to({alpha: 1}, 500, Phaser.Easing.Linear.None);
-
-                // Fade the text back out and add to the current wisdom if gussy was summoned
-                var textTweenEnd = this.add.tween(this.summonedText);
-                textTweenEnd.to({alpha: 0}, 500, Phaser.Easing.Linear.None, true, 5000);
-                textTweenEnd.onComplete.addOnce(function() {
-                    if(this.summoned == this.gussy) {
-                        this.currentWisdom++;
-                        if(this.currentWisdom == this.requiredWisdom) {
-                            // Activate the surprise ending
-                            console.log("You win!");
-                        }
-                    }
-                    this.smoke.visible = true;
-                    this.smoke.animations.play('coalesce', 11, false);
-                }, this);
-
-                textTween.chain(textTweenEnd);*/
 
                 // Display the wisdom for the given amount of time
                 this.time.events.add(Phaser.Timer.SECOND * this.wisdomDisplayTime, this.wisdomDelivered, this);
